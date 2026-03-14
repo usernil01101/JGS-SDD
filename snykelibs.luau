@@ -1,49 +1,4 @@
---[[
-╔══════════════════════════════════════════════════════════════════╗
-║                    HubLib v1.0                                   ║
-║         Viết lại từ ADS Library — tối ưu & dễ custom           ║
-╚══════════════════════════════════════════════════════════════════╝
 
-  ┌─────────────────────────────────────────────────────────────┐
-  │  🎨 ĐỂ CUSTOM THEME: Chỉ cần sửa bảng HubLib.Theme bên dưới │
-  │  Sau khi load, gọi:  HubLib.Theme.Main = Color3.fromRGB(...)  │
-  │  rồi tạo Window như bình thường.                              │
-  └─────────────────────────────────────────────────────────────┘
-
-  CÁCH DÙNG:
-  ─────────────────────────────────────────────────────────────
-  local Lib = loadstring(game:HttpGet('URL'))()
-
-  -- (tuỳ chọn) custom theme trước khi tạo window
-  Lib.Theme.Main    = Color3.fromRGB(255, 80, 140)  -- accent
-  Lib.Theme.Background = Color3.fromRGB(15, 15, 20)
-
-  local Win = Lib:Window({
-      Title   = 'My Hub',
-      Desc    = 'v1.0',
-      Icon    = 'house',
-      Theme   = 'Custom',   -- 'Dark' | 'Amethyst' | 'Custom'
-      Config  = { Keybind = Enum.KeyCode.RightShift,
-                  Size    = UDim2.new(0, 550, 0, 420) }
-  })
-
-  local Tab = Win:Tab({ Title = 'Main', Icon = 'bolt' })
-  local Sec = Tab:Section({ Title = 'Combat' })
-
-  Sec:Toggle({ Title = 'God Mode',  Value = false, Callback = function(v) print(v) end })
-  Sec:Slider({ Title = 'Speed',     Min=16, Max=100, Value=16, Callback = function(v) end })
-  Sec:Button({ Title = 'Teleport',  Callback = function() end })
-  Sec:Dropdown({ Title = 'Weapon',  List={'AK47','M4A1'}, Callback = function(v) end })
-  Sec:Textbox({ Title = 'Name',     Placeholder='Enter...', Callback = function(v) end })
-  Sec:Keybind({ Title = 'Toggle UI',Key = Enum.KeyCode.RightShift, Callback = function(k) end })
-  Sec:ColorPicker({ Title = 'Color', Value = Color3.fromRGB(255,0,0), Callback = function(r,g,b) end })
-
-  Win:Notify({ Title='Hello', Desc='World', Time=3, Type='normal' })
-]]
-
--- ════════════════════════════════════════════════════
---   THEME PRESETS
--- ════════════════════════════════════════════════════
 local Presets = {}
 
 
