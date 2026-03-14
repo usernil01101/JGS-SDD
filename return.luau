@@ -5,9 +5,11 @@ return {
 			Title    = 'Arsual v.52',
 			Author   = 'fr¿eze08',
 			Callback =function()
-				pcall(function()
-					loadstring(game:HttpGet(('https://github.com/usernil01101/JGS-SDD/edit/main/cache%20/Arsual.luau'),true))()
+				local sus,err = pcall(function()
+					loadstring(game:HttpGet(('https://raw.githubusercontent.com/usernil01101/JGS-SDD/refs/heads/main/cache%20/Arsual.luau'),true))()
 				end)
+				
+
 			end,
 		},
 
