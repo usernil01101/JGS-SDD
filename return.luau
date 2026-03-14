@@ -1,7 +1,7 @@
 
 return {
 	InGame = {
-		[286090429] = {
+		[111958650] = {
 			Title    = "Arsual v.52",
 			Author   = "fr¿eze08",
 			Image    = "",
