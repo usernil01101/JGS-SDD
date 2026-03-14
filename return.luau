@@ -1,4 +1,3 @@
-
 return {
 
 	InGame = { -- Arsenal
@@ -6,9 +5,12 @@ return {
 			Title    = 'Arsual v.52',
 			Author   = 'fr¿eze08',
 			Callback =function()
-				loadstring(game:HttpGet((''),true))()
+				pcall(function()
+					loadstring(game:HttpGet(('https://github.com/usernil01101/JGS-SDD/edit/main/cache%20/Arsual.luau'),true))()
+				end)
 			end,
-		}
+		},
+
 	},
 	
 	Universal = {
