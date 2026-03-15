@@ -156,20 +156,20 @@ Presets.Custom = {
 }
 local HubLib   = {}
 HubLib.__index = HubLib
-
+ 
 -- Expose theme bảng Custom để người dùng sửa trực tiếp
 HubLib.Theme = Presets.Custom
-
+ 
 local SaveTheme = {}
 local ScreenGui
 local U  = game:GetService('UserInputService')
 local Tw = game:GetService('TweenService')
-
+ 
 -- ─── Helpers ───────────────────────────────────────
 local function tw(v, t, s, dir, goals)
 	return Tw:Create(v, TweenInfo.new(t, s, Enum.EasingDirection[dir]), goals)
 end
-
+ 
 local function inst(class, props)
 	local o = Instance.new(class)
 	for k, v in pairs(props or {}) do o[k] = v end
@@ -181,14 +181,14 @@ local function inst(class, props)
 	end
 	return o
 end
-
+ 
 local function corner(parent, rad)
 	local c = Instance.new('UICorner')
 	c.CornerRadius = UDim.new(0, rad or 6)
 	c.Parent = parent
 	return c
 end
-
+ 
 local function padding(parent, t, b, l, r)
 	local p = Instance.new('UIPadding')
 	p.PaddingTop    = UDim.new(0, t or 0)
@@ -198,7 +198,7 @@ local function padding(parent, t, b, l, r)
 	p.Parent = parent
 	return p
 end
-
+ 
 local function stroke(parent, color, thickness, transparency)
 	local s = Instance.new('UIStroke')
 	s.Color        = color or Color3.new(1,1,1)
@@ -207,7 +207,7 @@ local function stroke(parent, color, thickness, transparency)
 	s.Parent = parent
 	return s
 end
-
+ 
 local function list(parent, dir, halign, valign, pad, sort)
 	local l = Instance.new('UIListLayout')
 	l.FillDirection       = dir or Enum.FillDirection.Vertical
@@ -218,7 +218,7 @@ local function list(parent, dir, halign, valign, pad, sort)
 	l.Parent = parent
 	return l
 end
-
+ 
 local function click(parent)
 	local b = inst('TextButton',{
 		Name='Click', Parent=parent,
@@ -229,7 +229,7 @@ local function click(parent)
 	})
 	return b
 end
-
+ 
 local function ripple(container, clickBtn)
 	clickBtn.MouseButton1Click:Connect(function()
 		local Mouse = game:GetService('Players').LocalPlayer:GetMouse()
@@ -249,7 +249,7 @@ local function ripple(container, clickBtn)
 		t:Play()
 	end)
 end
-
+ 
 local function drag(handle, target)
 	local dragging, dragInput, startPos, startTarget
 	handle.InputBegan:Connect(function(i)
@@ -270,15 +270,15 @@ local function drag(handle, target)
 			local d = i.Position - startPos
 			tw(target, 0.05, Enum.EasingStyle.Linear, 'InOut', {
 				Position = UDim2.new(startTarget.X.Scale, startTarget.X.Offset+d.X,
-					startTarget.Y.Scale, startTarget.Y.Offset+d.Y)
+				                     startTarget.Y.Scale, startTarget.Y.Offset+d.Y)
 			}):Play()
 		end
 	end)
 end
-
+ 
 local function autoCanvas(sf, layout, extra)
 	if not sf or typeof(sf) ~= 'Instance' then return end
-
+ 
 	local function update()
 		local target = layout
 		if not target or typeof(target) ~= 'Instance' or not target:IsA('UIGridStyleLayout') then
@@ -293,7 +293,7 @@ local function autoCanvas(sf, layout, extra)
 			end)
 		end
 	end
-
+ 
 	task.defer(function()
 		local target = layout or sf:FindFirstChildOfClass('UIListLayout') or sf:FindFirstChildOfClass('UIGridLayout')
 		if target then
@@ -302,19 +302,19 @@ local function autoCanvas(sf, layout, extra)
 		end
 	end)
 end
-
+ 
 -- ─── Theme registration ────────────────────────────
 local function regTheme(key, obj)
 	SaveTheme[key] = SaveTheme[key] or {}
 	table.insert(SaveTheme[key], obj)
 end
-
+ 
 local function getPath(tbl, path)
 	local r = tbl
 	for _, p in ipairs(string.split(path, '.')) do r = r and r[p] end
 	return r
 end
-
+ 
 local function applyTheme(themeData)
 	for key, objs in pairs(SaveTheme) do
 		if objs and #objs > 0 then
@@ -341,7 +341,7 @@ local function applyTheme(themeData)
 		end
 	end
 end
-
+ 
 -- ─── Tooltip helper ─────────────────────────────────
 local function makeTooltip(parent, title, author, T)
 	-- Panel tooltip (parented to ScreenGui, vị trí theo chuột)
@@ -354,14 +354,14 @@ local function makeTooltip(parent, title, author, T)
 	})
 	corner(tip, 6)
 	stroke(tip, T and T.Main or Color3.fromRGB(110,75,240), 1, 0.5)
-
+ 
 	local inner = inst('Frame', {
 		Parent = tip, BackgroundTransparency = 1, BorderSizePixel = 0,
 		Size = UDim2.new(0, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.XY,
 	})
 	padding(inner, 6, 6, 10, 10)
 	list(inner, nil, nil, nil, 3)
-
+ 
 	local lblTitle = inst('TextLabel', {
 		Parent = inner, BackgroundTransparency = 1, BorderSizePixel = 0,
 		Size = UDim2.new(0, 0, 0, 14), AutomaticSize = Enum.AutomaticSize.X,
@@ -377,10 +377,10 @@ local function makeTooltip(parent, title, author, T)
 		TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 201,
 		TextTransparency = 0.2,
 	})
-
+ 
 	return tip, lblTitle, lblAuthor
 end
-
+ 
 -- ─── Icon loader ────────────────────────────────────
 local IconList
 local function loadIcons()
@@ -390,7 +390,7 @@ local function loadIcons()
 	end)
 	if ok then IconList = res end
 end
-
+ 
 local function getIcon(i)
 	loadIcons()
 	if IconList and type(i) == 'string' then
@@ -403,7 +403,7 @@ local function getIcon(i)
 	local id = type(i) == 'number' and ('rbxassetid://'..i) or (type(i)=='string' and not i:find('rbxassetid://') and ('rbxassetid://'..i) or (type(i)=='string' and i or nil))
 	return { Image = id or 'rbxassetid://0', ImageRectSize=Vector2.new(0,0), ImageRectOffset=Vector2.new(0,0) }
 end
-
+ 
 -- ─── Item background helper ─────────────────────────
 local function itemBg(parent, title, desc, icon, funcType, T)
 	local wrap = inst('Frame',{
@@ -418,14 +418,14 @@ local function itemBg(parent, title, desc, icon, funcType, T)
 	})
 	regTheme('Function.'..funcType..'.Background', bg)
 	corner(bg)
-
+ 
 	local inner = inst('Frame',{
 		Name='T', Parent=bg, BackgroundTransparency=1, BorderSizePixel=0,
 		AnchorPoint=Vector2.new(0,0.5), Position=UDim2.new(0,0,0.5,0), Size=UDim2.new(1,0,1,0)
 	})
 	list(inner, nil, nil, Enum.VerticalAlignment.Center, 0)
 	local ip = padding(inner, 0, 0, 13, 70)
-
+ 
 	local titleLabel = inst('TextLabel',{
 		Name='Title', Parent=inner, BackgroundTransparency=1, BorderSizePixel=0,
 		Size=UDim2.new(1,0,0,14), Font=Enum.Font.GothamBold, RichText=true,
@@ -434,7 +434,7 @@ local function itemBg(parent, title, desc, icon, funcType, T)
 		AutomaticSize=Enum.AutomaticSize.Y
 	})
 	regTheme('Text & Icon', titleLabel)
-
+ 
 	local descLabel = inst('TextLabel',{
 		Name='Desc', Parent=inner, BackgroundTransparency=1, BorderSizePixel=0,
 		LayoutOrder=0, Size=UDim2.new(1,0,0,14), Font=Enum.Font.GothamBold, RichText=true,
@@ -443,7 +443,7 @@ local function itemBg(parent, title, desc, icon, funcType, T)
 		AutomaticSize=Enum.AutomaticSize.Y, Visible=(desc and desc ~= '')
 	})
 	regTheme('Text & Icon', descLabel)
-
+ 
 	if icon and icon ~= '' then
 		ip.PaddingLeft = UDim.new(0, 50)
 		local imgFrame = inst('Frame',{Name='Image',Parent=bg,BackgroundTransparency=1,BorderSizePixel=0,Size=UDim2.new(0,40,1,0)})
@@ -457,7 +457,7 @@ local function itemBg(parent, title, desc, icon, funcType, T)
 		local div = inst('Frame',{Parent=imgFrame,BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=0.9,BorderSizePixel=0,AnchorPoint=Vector2.new(1,0.5),Position=UDim2.new(1,0,0.5,0),Size=UDim2.new(0,1,0.7,0)})
 		regTheme('Text & Icon', div)
 	end
-
+ 
 	-- dynamic height
 	local function updateHeight()
 		task.defer(function()
@@ -471,7 +471,7 @@ local function itemBg(parent, title, desc, icon, funcType, T)
 	if innerLayout then
 		innerLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(updateHeight)
 	end
-
+ 
 	local api = {}
 	function api:SetTitle(v) titleLabel.Text = v end
 	function api:SetDesc(v)
@@ -485,10 +485,10 @@ local function itemBg(parent, title, desc, icon, funcType, T)
 		end
 	end
 	function api:SetRightPad(v) ip.PaddingRight = UDim.new(0, v) end
-
+ 
 	return bg, api
 end
-
+ 
 -- ════════════════════════════════════════════════════
 --   DROPDOWN SELECT (reusable)
 -- ════════════════════════════════════════════════════
@@ -517,7 +517,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 		Size=UDim2.new(0,20,0,20), Image='rbxassetid://14937709869', ImageTransparency=0.3
 	})
 	regTheme('Text & Icon', chevron)
-
+ 
 	-- Dropdown panel
 	local panel = inst('Frame',{
 		Parent=ScreenGui, BackgroundColor3=T.Function.Dropdown['Dropdown Select'].Background,
@@ -527,7 +527,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 	corner(panel, 4)
 	local panelStroke = stroke(panel, Color3.new(1,1,1), 1, 1)
 	padding(panel, 5, 5, 5, 5)
-
+ 
 	-- Search bar
 	local searchFrame = inst('Frame',{
 		Name='Search', Parent=panel, BackgroundTransparency=0.95, BorderSizePixel=0,
@@ -541,7 +541,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 		PlaceholderText='Search...', Text='', TextColor3=T['Text & Icon'], TextSize=11
 	})
 	regTheme('Text & Icon', searchBox)
-
+ 
 	-- Items container
 	local itemsWrap = inst('Frame',{Parent=panel, BackgroundTransparency=0.95, BorderSizePixel=0, Size=UDim2.new(1,0,1,0)})
 	corner(itemsWrap, 4)
@@ -556,11 +556,11 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 	padding(sf, 0, 0, 0, 5)
 	local itemsWrapPad = inst('UIPadding',{PaddingTop=UDim.new(0,25), Parent=itemsWrap})
 	autoCanvas(sf, itemList, 5)
-
+ 
 	local isOpen = false
 	local selectedValues = {}
 	local selectedItem
-
+ 
 	local function updatePanelSize()
 		if not isOpen then return end
 		local visible = 0
@@ -568,7 +568,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 		local h = math.min(itemList.AbsoluteContentSize.Y + 54, 200)
 		tw(panel, 0.15, Enum.EasingStyle.Exponential, 'Out', {Size=UDim2.new(0,150,0,h)}):Play()
 	end
-
+ 
 	searchBox.Changed:Connect(function()
 		local q = searchBox.Text:lower()
 		for _, c in ipairs(sf:GetChildren()) do
@@ -579,7 +579,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 		end
 		updatePanelSize()
 	end)
-
+ 
 	local function openPanel()
 		if isOpen then return end
 		isOpen = true
@@ -597,7 +597,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 		t:Play()
 		t.Completed:Connect(function() panel.Visible = false; isOpen = false end)
 	end
-
+ 
 	U.InputBegan:Connect(function(inp)
 		if inp.UserInputType == Enum.UserInputType.MouseButton1 then
 			local b, s = panel.AbsolutePosition, panel.AbsoluteSize
@@ -605,13 +605,13 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 			if mx < b.X or mx > b.X+s.X or my < b.Y-21 or my > b.Y+s.Y then closePanel() end
 		end
 	end)
-
+ 
 	click(clickTarget).MouseButton1Click:Connect(function()
 		if isOpen then closePanel() else openPanel() end
 	end)
-
+ 
 	local API = {}
-
+ 
 	function API:Add(text)
 		local item = inst('Frame',{
 			Name='Item', Parent=sf, BackgroundTransparency=0.95, BorderSizePixel=0,
@@ -620,7 +620,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 		corner(item, 4)
 		padding(item, 0, 0, 5, 0)
 		regTheme('Function.Dropdown.Dropdown Select.Item Background', item)
-
+ 
 		local lbl = inst('TextLabel',{
 			Parent=item, BackgroundTransparency=1, BorderSizePixel=0,
 			Size=UDim2.new(1,0,1,0), Font=Enum.Font.GothamBold,
@@ -628,10 +628,10 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 			TextXAlignment=Enum.TextXAlignment.Left, TextTransparency=0.8
 		})
 		regTheme('Text & Icon', lbl)
-
+ 
 		local function highlight() tw(lbl, 0.15, Enum.EasingStyle.Linear, 'Out', {TextTransparency=0}):Play() end
 		local function unhighlight() tw(lbl, 0.15, Enum.EasingStyle.Linear, 'Out', {TextTransparency=0.8}):Play() end
-
+ 
 		click(item).MouseButton1Click:Connect(function()
 			if isMulti then
 				if selectedValues[text] then selectedValues[text] = nil; unhighlight()
@@ -648,7 +648,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 				highlight(); selectedItem = text; valText.Text = text; pcall(callback, text)
 			end
 		end)
-
+ 
 		-- pre-select default
 		task.defer(function()
 			if isMulti then
@@ -660,7 +660,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 			end
 		end)
 	end
-
+ 
 	function API:SetValue(val)
 		if isMulti then
 			selectedValues = {}
@@ -686,7 +686,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 			pcall(callback, val)
 		end
 	end
-
+ 
 	function API:Clear(name)
 		if isMulti then selectedValues={}; valText.Text='--'; pcall(callback,{}) end
 		for _, c in ipairs(sf:GetChildren()) do
@@ -696,247 +696,20 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 		end
 		if name == nil or selectedItem == name then selectedItem=nil; valText.Text='--' end
 	end
-
+ 
 	-- populate list
 	for _, v in ipairs(listItems) do API:Add(v) end
-
+ 
 	return API
 end
-
+ 
 -- ════════════════════════════════════════════════════
 --   WINDOW
 -- ════════════════════════════════════════════════════
--- ════════════════════════════════════════════════════
---   KEY SYSTEM
--- ════════════════════════════════════════════════════
-HubLib._keyData = nil  -- nil = không cần key
-
---[[
-  Cách dùng:
-  HubLib:SetKey({
-      Keys        = { 'MYKEY123', 'VIPKEY456' },  -- danh sách key hợp lệ
-      Title       = 'My Hub Key System',           -- tiêu đề cửa sổ key
-      Desc        = 'Nhập key để mở hub',          -- mô tả
-      GetKeyLink  = 'https://linkvertise.com/xxx', -- link lấy key
-      SaveKey     = true,                          -- lưu key vào bộ nhớ (mặc định true)
-  })
-  local Win = HubLib:Window({ ... })              -- sẽ hỏi key trước khi hiện UI
-]]
-
-function HubLib:SetKey(kp)
-	self._keyData = {
-		Keys       = kp.Keys       or {},
-		Title      = kp.Title      or 'Key System',
-		Desc       = kp.Desc       or 'Enter your key to continue',
-		GetKeyLink = kp.GetKeyLink or nil,
-		SaveKey    = kp.SaveKey    ~= false,  -- mặc định true
-	}
-end
-
-local function showKeyUI(keyData, onSuccess)
-	local guiParent
-	pcall(function() guiParent = game:GetService('CoreGui') end)
-	if not guiParent then guiParent = game:GetService('Players').LocalPlayer:WaitForChild('PlayerGui') end
-
-	-- Xoá cũ nếu có
-	local old = guiParent:FindFirstChild('HubLib_KeyUI')
-	if old then old:Destroy() end
-
-	local keyGui = inst('ScreenGui', {
-		Name='HubLib_KeyUI', Parent=guiParent,
-		ResetOnSpawn=false, DisplayOrder=1000,
-		ZIndexBehavior=Enum.ZIndexBehavior.Sibling
-	})
-
-	-- Overlay mờ
-	inst('Frame', {
-		Parent=keyGui, BackgroundColor3=Color3.new(0,0,0),
-		BackgroundTransparency=0.4, BorderSizePixel=0,
-		Size=UDim2.new(1,0,1,0)
-	})
-
-	-- Box chính
-	local box = inst('CanvasGroup', {
-		Parent=keyGui, AnchorPoint=Vector2.new(0.5,0.5),
-		BackgroundColor3=Color3.fromRGB(15,14,22),
-		BorderSizePixel=0, Position=UDim2.new(0.5,0,0.5,0),
-		Size=UDim2.new(0,0,0,0), GroupTransparency=1,
-		ClipsDescendants=true
-	})
-	corner(box, 12)
-	stroke(box, Color3.fromRGB(110,75,240), 1.5, 0.5)
-
-	-- Pop-in
-	tw(box, 0.3, Enum.EasingStyle.Back, 'Out', {
-		Size=UDim2.new(0,340,0,210), GroupTransparency=0
-	}):Play()
-
-	padding(box, 20, 20, 24, 24)
-	local layout = list(box, nil, Enum.HorizontalAlignment.Center, nil, 10)
-
-	-- Icon + Title
-	local titleRow = inst('Frame', {
-		Parent=box, BackgroundTransparency=1, BorderSizePixel=0,
-		Size=UDim2.new(1,0,0,28)
-	})
-	list(titleRow, Enum.FillDirection.Horizontal, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center, 8)
-
-	inst('ImageLabel', {
-		Parent=titleRow, BackgroundTransparency=1, BorderSizePixel=0,
-		Size=UDim2.new(0,22,0,22),
-		Image='rbxassetid://10723407389', ImageColor3=Color3.fromRGB(110,75,240)
-	})
-	inst('TextLabel', {
-		Parent=titleRow, BackgroundTransparency=1, BorderSizePixel=0,
-		Size=UDim2.new(0,0,1,0), AutomaticSize=Enum.AutomaticSize.X,
-		Font=Enum.Font.GothamBold, Text=keyData.Title,
-		TextColor3=Color3.fromRGB(245,245,255), TextSize=15
-	})
-
-	-- Desc
-	inst('TextLabel', {
-		Parent=box, BackgroundTransparency=1, BorderSizePixel=0,
-		Size=UDim2.new(1,0,0,14),
-		Font=Enum.Font.Gotham, Text=keyData.Desc,
-		TextColor3=Color3.fromRGB(180,175,210), TextSize=11,
-		TextXAlignment=Enum.TextXAlignment.Center
-	})
-
-	-- Input box
-	local inputWrap = inst('Frame', {
-		Parent=box, BackgroundColor3=Color3.fromRGB(28,27,42),
-		BorderSizePixel=0, Size=UDim2.new(1,0,0,36)
-	})
-	corner(inputWrap, 8)
-	local inputStroke = stroke(inputWrap, Color3.fromRGB(110,75,240), 1, 0.7)
-	padding(inputWrap, 0,0,12,12)
-
-	local tb = inst('TextBox', {
-		Parent=inputWrap, BackgroundTransparency=1, BorderSizePixel=0,
-		Size=UDim2.new(1,0,1,0),
-		Font=Enum.Font.GothamBold, PlaceholderText='Nhập key của bạn...',
-		PlaceholderColor3=Color3.fromRGB(100,95,130),
-		Text='', TextColor3=Color3.fromRGB(245,245,255),
-		TextSize=12, TextXAlignment=Enum.TextXAlignment.Left,
-		ClearTextOnFocus=false
-	})
-
-	-- Focus glow
-	tb.Focused:Connect(function()
-		tw(inputStroke, 0.15, Enum.EasingStyle.Quad, 'Out', {Transparency=0, Thickness=1.5}):Play()
-	end)
-	tb.FocusLost:Connect(function()
-		tw(inputStroke, 0.15, Enum.EasingStyle.Quad, 'Out', {Transparency=0.7, Thickness=1}):Play()
-	end)
-
-	-- Status label
-	local statusLbl = inst('TextLabel', {
-		Parent=box, BackgroundTransparency=1, BorderSizePixel=0,
-		Size=UDim2.new(1,0,0,13),
-		Font=Enum.Font.Gotham, Text='',
-		TextColor3=Color3.fromRGB(255,80,80), TextSize=11,
-		TextXAlignment=Enum.TextXAlignment.Center
-	})
-
-	-- Buttons row
-	local btnRow = inst('Frame', {
-		Parent=box, BackgroundTransparency=1, BorderSizePixel=0,
-		Size=UDim2.new(1,0,0,32)
-	})
-	list(btnRow, Enum.FillDirection.Horizontal, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center, 10)
-
-	local function makeBtn(lbl, color, order)
-		local f = inst('Frame', {
-			Parent=btnRow, BackgroundColor3=color,
-			BorderSizePixel=0, LayoutOrder=order,
-			Size=UDim2.new(0, keyData.GetKeyLink and 130 or 270, 0, 32)
-		})
-		corner(f, 8)
-		inst('TextLabel', {
-			Parent=f, BackgroundTransparency=1, BorderSizePixel=0,
-			Size=UDim2.new(1,0,1,0), Font=Enum.Font.GothamBold,
-			Text=lbl, TextColor3=Color3.fromRGB(255,255,255), TextSize=12
-		})
-		local c = click(f)
-		return f, c
-	end
-
-	-- Nút Xác nhận
-	local _, confirmClick = makeBtn('✓  Xác nhận', Color3.fromRGB(80,55,200), 1)
-	confirmClick.MouseButton1Click:Connect(function()
-		local entered = tb.Text:gsub('%s','')
-		local valid = false
-		for _, k in ipairs(keyData.Keys) do
-			if k == entered then valid = true; break end
-		end
-		if valid then
-			-- Lưu key nếu bật
-			if keyData.SaveKey then
-				pcall(function() writefile('hublib_key.txt', entered) end)
-			end
-			statusLbl.TextColor3 = Color3.fromRGB(80,220,120)
-			statusLbl.Text = '✓  Key hợp lệ! Đang mở...'
-			tw(box, 0.3, Enum.EasingStyle.Back, 'In', {GroupTransparency=1, Size=UDim2.new(0,340,0,0)}):Play()
-			task.delay(0.35, function()
-				keyGui:Destroy()
-				onSuccess()
-			end)
-		else
-			statusLbl.TextColor3 = Color3.fromRGB(255,80,80)
-			statusLbl.Text = '✗  Key không hợp lệ!'
-			tw(box, 0.05, Enum.EasingStyle.Linear, 'InOut', {Position=UDim2.new(0.5,6,0.5,0)}):Play()
-			task.delay(0.05, function()
-				tw(box, 0.05, Enum.EasingStyle.Linear, 'InOut', {Position=UDim2.new(0.5,-6,0.5,0)}):Play()
-				task.delay(0.05, function()
-					tw(box, 0.05, Enum.EasingStyle.Linear, 'InOut', {Position=UDim2.new(0.5,0,0.5,0)}):Play()
-				end)
-			end)
-		end
-	end)
-
-	-- Nút Lấy Key (nếu có link)
-	if keyData.GetKeyLink then
-		local _, getKeyClick = makeBtn('🔑  Lấy Key', Color3.fromRGB(40,38,62), 2)
-		getKeyClick.MouseButton1Click:Connect(function()
-			if setclipboard then setclipboard(keyData.GetKeyLink) end
-			statusLbl.TextColor3 = Color3.fromRGB(110,75,240)
-			statusLbl.Text = '📋  Đã copy link lấy key!'
-			if syn and syn.request then
-				syn.request({Url=keyData.GetKeyLink, Method='GET'})
-			end
-		end)
-	end
-
-	-- Enter để confirm
-	tb.FocusLost:Connect(function(enterPressed)
-		if enterPressed then
-			confirmClick.MouseButton1Click:Fire()
-		end
-	end)
-end
-
+ 
+ 
+ 
 function HubLib:Window(p)
-	-- ── Key check ───────────────────────────────────
-	if HubLib._keyData then
-		local kd = HubLib._keyData
-		-- Kiểm tra key đã lưu
-		local savedKey = ''
-		pcall(function() savedKey = readfile('hublib_key.txt') end)
-		savedKey = savedKey and savedKey:gsub('%s','') or ''
-
-		local alreadyValid = false
-		for _, k in ipairs(kd.Keys) do
-			if k == savedKey then alreadyValid = true; break end
-		end
-
-		if not alreadyValid then
-			-- Hiện UI key, tạm dừng cho đến khi nhập đúng
-			local done = false
-			showKeyUI(kd, function() done = true end)
-			repeat task.wait(0.05) until done
-		end
-	end
-
 	local title   = p.Title or 'Hub'
 	local desc    = p.Desc  or ''
 	local icon    = p.Icon  or 'house'
@@ -945,13 +718,13 @@ function HubLib:Window(p)
 	local cfg     = p.Config or {}
 	local keybind = cfg.Keybind or Enum.KeyCode.RightShift
 	local size    = cfg.Size    or UDim2.new(0, 530, 0, 400)
-
+ 
 	-- resolve theme
 	local themeName = p.Theme or 'Custom'
 	local T = Presets[themeName] or Presets.Custom
 	-- allow runtime overrides from HubLib.Theme when 'Custom'
 	if themeName == 'Custom' then T = HubLib.Theme end
-
+ 
 	-- cleanup old + fallback PlayerGui nếu không có quyền CoreGui
 	local guiParent
 	local _ok = pcall(function()
@@ -967,13 +740,13 @@ function HubLib:Window(p)
 		guiParent = pg
 	end
 	SaveTheme = {}
-
+ 
 	ScreenGui = inst('ScreenGui',{
 		Name='HubLib_GUI', ResetOnSpawn=false,
 		ZIndexBehavior=Enum.ZIndexBehavior.Sibling, DisplayOrder=999,
 		Parent=guiParent
 	})
-
+ 
 	-- ── Shadow + Background ─────────────────────────
 	local shadow = inst('ImageLabel',{
 		Name='Shadow', Parent=ScreenGui,
@@ -985,7 +758,7 @@ function HubLib:Window(p)
 	})
 	regTheme('Shadow', shadow)
 	padding(shadow, 8, 8, 8, 8)
-
+ 
 	local mainFrame = inst('CanvasGroup',{
 		Name='Background', Parent=shadow,
 		AnchorPoint=Vector2.new(0.5,0.5), BackgroundColor3=T.Background,
@@ -995,17 +768,17 @@ function HubLib:Window(p)
 	})
 	regTheme('Background', mainFrame)
 	corner(mainFrame, 17)
-
+ 
 	-- pop-in animation
 	local orgSize = UDim2.new(1,0,1,0)
 	tw(mainFrame, 0.2, Enum.EasingStyle.Back, 'Out', {GroupTransparency=0, Size=orgSize}):Play()
-
+ 
 	-- Content area
 	local contentArea = inst('Frame',{
 		Name='Page', Parent=mainFrame, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,1,0)
 	})
 	padding(contentArea, 45, 5, 120, 5)
-
+ 
 	-- ── Topbar ──────────────────────────────────────
 	local topbar = inst('Frame',{
 		Name='Topbar', Parent=mainFrame, BackgroundTransparency=1, BorderSizePixel=0,
@@ -1016,12 +789,12 @@ function HubLib:Window(p)
 	regTheme('Page', divH)
 	local divV = inst('Frame',{Parent=mainFrame, BackgroundColor3=T.Page, BorderSizePixel=0, Position=UDim2.new(0,110,0,42), Size=UDim2.new(0,1,1,-42), ZIndex=5})
 	regTheme('Page', divV)
-
+ 
 	-- Left: icon + title
 	local titleArea = inst('Frame',{Parent=topbar, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,1,0)})
 	padding(titleArea, 5, 5, 10, 10)
 	list(titleArea, Enum.FillDirection.Horizontal, nil, Enum.VerticalAlignment.Center, 8)
-
+ 
 	local winIcon = inst('ImageLabel',{
 		Parent=titleArea, BackgroundTransparency=1, BorderSizePixel=0,
 		Size=UDim2.new(0,28,0,28), LayoutOrder=0,
@@ -1029,10 +802,10 @@ function HubLib:Window(p)
 		ImageRectOffset=getIcon(icon).ImageRectOffset or Vector2.new(0,0)
 	})
 	regTheme('Text & Icon', winIcon)
-
+ 
 	local titleBlock = inst('Frame',{Parent=titleArea, BackgroundTransparency=1, BorderSizePixel=0, LayoutOrder=1, Size=UDim2.new(0,120,1,0)})
 	list(titleBlock, nil, nil, Enum.VerticalAlignment.Center, 1)
-
+ 
 	local titleLbl = inst('TextLabel',{
 		Parent=titleBlock, BackgroundTransparency=1, BorderSizePixel=0,
 		Size=UDim2.new(1,0,0,13), Font=Enum.Font.GothamBold,
@@ -1046,7 +819,7 @@ function HubLib:Window(p)
 		TextXAlignment=Enum.TextXAlignment.Left, Visible=desc~=''
 	})
 	regTheme('Text & Icon', descLbl)
-
+ 
 	if version then
 		local vbox = inst('Frame',{
 			Parent=titleArea, BackgroundColor3=T.Page, BorderSizePixel=0,
@@ -1063,12 +836,12 @@ function HubLib:Window(p)
 		regTheme('Text & Icon', vtxt)
 		task.defer(function() vbox.Size = UDim2.new(0, vtxt.TextBounds.X+12, 0, 18) end)
 	end
-
+ 
 	-- Right: controls
 	local controls = inst('Frame',{Parent=topbar, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,1,0)})
 	padding(controls, 5, 5, 10, 10)
 	list(controls, Enum.FillDirection.Horizontal, Enum.HorizontalAlignment.Right, Enum.VerticalAlignment.Center, 10)
-
+ 
 	local function ctrlBtn(imgId, order, alpha)
 		return inst('ImageButton',{
 			Parent=controls, Active=true, BackgroundTransparency=1, BorderSizePixel=0,
@@ -1079,13 +852,13 @@ function HubLib:Window(p)
 	local closeBtn = ctrlBtn('rbxassetid://15082305656', 3)
 	local miniBtn  = ctrlBtn('rbxassetid://13857987062', 2, 0.5)
 	regTheme('Text & Icon', miniBtn)
-
+ 
 	-- Theme dropdown in topbar
 	local themeHolder = inst('Frame',{
 		Name='ThemeHolder', Parent=controls, BackgroundTransparency=1, BorderSizePixel=0,
 		LayoutOrder=1, Size=UDim2.new(0,120,0.8,0)
 	})
-
+ 
 	-- Discord button
 	if discord then
 		local db = inst('TextButton',{
@@ -1100,17 +873,17 @@ function HubLib:Window(p)
 			if setclipboard then setclipboard(discord) end
 		end)
 	end
-
+ 
 	-- Draggable
 	drag(topbar, shadow)
-
+ 
 	-- ── Sidebar ─────────────────────────────────────
 	local sidebarArea = inst('Frame',{
 		Parent=mainFrame, BackgroundTransparency=1, BorderSizePixel=0,
 		Size=UDim2.new(1,0,1,0)
 	})
 	padding(sidebarArea, 45, 5, 3, 0)
-
+ 
 	local sidebarOuter = inst('Frame',{Parent=sidebarArea, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(0,107,1,0)})
 	local sidebarSF = inst('ScrollingFrame',{
 		Name='SidebarSF', Parent=sidebarOuter, Active=true, BackgroundTransparency=1, BorderSizePixel=0,
@@ -1119,14 +892,14 @@ function HubLib:Window(p)
 		ScrollingDirection=Enum.ScrollingDirection.Y
 	})
 	regTheme('Main', sidebarSF)
-
+ 
 	local tabList = inst('Frame',{
 		Name='TabList', Parent=sidebarSF, BackgroundTransparency=1, BorderSizePixel=0,
 		Size=UDim2.new(1,0,1,0)
 	})
 	local tabListLayout = list(tabList, nil, Enum.HorizontalAlignment.Center)
 	padding(sidebarSF, 1, 1, 1, 1)
-
+ 
 	-- Selector indicator
 	local selector = inst('Frame',{
 		Parent=sidebarSF, BackgroundColor3=T.Main, BorderSizePixel=0,
@@ -1136,17 +909,17 @@ function HubLib:Window(p)
 	corner(selector, 10)
 	local selStroke = stroke(selector, T.Page, 1, 0.9)
 	regTheme('Page', selStroke)
-
+ 
 	autoCanvas(sidebarSF, tabListLayout, 5)
-
+ 
 	-- ── Window Object ────────────────────────────────
 	local Win = { _tabs = {}, _started = false, _T = T, _theme = themeName }
-
+ 
 	-- Theme dropdown
 	local themeNames = {}
 	for k in pairs(Presets) do themeNames[#themeNames+1] = k end
 	table.sort(themeNames)
-
+ 
 	local themeDD = buildDropdownSelect(themeHolder, themeHolder, false, function(chosen)
 		local newT = Presets[chosen]
 		if not newT then return end
@@ -1156,10 +929,10 @@ function HubLib:Window(p)
 		selector.BackgroundColor3 = newT.Main
 		sidebarSF.ScrollBarImageColor3 = newT.Main
 	end, themeName, themeNames, T)
-
+ 
 	-- Apply initial theme
 	task.defer(function() applyTheme(T) end)
-
+ 
 	-- ── Close & Minimize ────────────────────────────
 	closeBtn.MouseButton1Click:Connect(function()
 		Win:Dialog({
@@ -1168,9 +941,9 @@ function HubLib:Window(p)
 			Button2 = { Title='Cancel',  Color=Color3.fromRGB(226,39,6) }
 		})
 	end)
-
+ 
 	local storedSize = size
-
+ 
 	-- Icon nhỏ tròn hiện khi minimize
 	local miniIcon = inst('ImageButton', {
 		Name            = 'MiniIcon',
@@ -1184,7 +957,7 @@ function HubLib:Window(p)
 	})
 	do local c = miniIcon:FindFirstChildOfClass('UICorner'); if c then c.CornerRadius = UDim.new(0,100) end end
 	stroke(miniIcon, Color3.new(1,1,1), 2, 0.7)
-
+ 
 	-- Icon bên trong miniIcon
 	local miniIconImg = inst('ImageLabel', {
 		Parent              = miniIcon,
@@ -1197,10 +970,10 @@ function HubLib:Window(p)
 		ImageRectSize       = getIcon(icon).ImageRectSize,
 		ImageRectOffset     = getIcon(icon).ImageRectOffset or Vector2.new(0,0),
 	})
-
+ 
 	-- Drag miniIcon
 	drag(miniIcon, miniIcon)
-
+ 
 	-- Bấm miniIcon → phóng to lại
 	miniIcon.MouseButton1Click:Connect(function()
 		miniIcon.Visible = false
@@ -1208,7 +981,7 @@ function HubLib:Window(p)
 		shadow.Size      = UDim2.fromOffset(0, 0)
 		tw(shadow, 0.4, Enum.EasingStyle.Back, 'Out', {Size = storedSize}):Play()
 	end)
-
+ 
 	-- Bấm nút minimize → thu nhỏ thành icon
 	local isMinimized = false
 	miniBtn.MouseButton1Click:Connect(function()
@@ -1224,7 +997,7 @@ function HubLib:Window(p)
 			end
 		end)
 	end)
-
+ 
 	-- Keybind toggle
 	U.InputBegan:Connect(function(inp)
 		if inp.UserInputType ~= Enum.UserInputType.Keyboard then return end
@@ -1240,7 +1013,7 @@ function HubLib:Window(p)
 			shadow.Visible = not shadow.Visible
 		end
 	end)
-
+ 
 	-- ── Notify ──────────────────────────────────────
 	local notifContainer = inst('Frame',{
 		Parent=ScreenGui, BackgroundTransparency=1, BorderSizePixel=0,
@@ -1248,7 +1021,7 @@ function HubLib:Window(p)
 	})
 	padding(notifContainer, 0, 20, 0, 5)
 	list(notifContainer, nil, Enum.HorizontalAlignment.Right, Enum.VerticalAlignment.Bottom, 5)
-
+ 
 	function Win:Notify(p)
 		local ntitle = p.Title or ''
 		local ndesc  = p.Desc  or ''
@@ -1256,7 +1029,7 @@ function HubLib:Window(p)
 		local ntype  = p.Type  or 'normal'
 		local typeColors = { error=Color3.fromRGB(255,60,60), warning=Color3.fromRGB(255,200,0), normal=Color3.fromRGB(0,200,255) }
 		local accentColor = typeColors[ntype] or typeColors.normal
-
+ 
 		local ns = inst('ImageLabel',{
 			Parent=notifContainer, BackgroundTransparency=1,
 			Size=UDim2.new(0,180,0,0), Image='rbxassetid://1316045217',
@@ -1265,7 +1038,7 @@ function HubLib:Window(p)
 		})
 		regTheme('Shadow', ns)
 		padding(ns, 5, 5, 5, 5)
-
+ 
 		local nb = inst('CanvasGroup',{
 			Parent=ns, AnchorPoint=Vector2.new(0.5,0.5), BackgroundColor3=T.Background,
 			BorderSizePixel=0, Position=UDim2.new(0.5,0,0.5,0),
@@ -1274,7 +1047,7 @@ function HubLib:Window(p)
 		})
 		regTheme('Background', nb)
 		corner(nb, 6)
-
+ 
 		local progressBar = inst('Frame',{
 			Parent=nb, AnchorPoint=Vector2.new(0.5,1), BackgroundColor3=accentColor,
 			BackgroundTransparency=0.3, BorderSizePixel=0,
@@ -1283,7 +1056,7 @@ function HubLib:Window(p)
 		local textArea = inst('Frame',{Parent=nb, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,1,0)})
 		padding(textArea, 5, 5, 5, 5)
 		list(textArea, nil, nil, nil, 3)
-
+ 
 		local ntitleLbl = inst('TextLabel',{
 			Parent=textArea, AutomaticSize=Enum.AutomaticSize.Y, BackgroundTransparency=1, BorderSizePixel=0,
 			Size=UDim2.new(1,0,0,0), Font=Enum.Font.GothamBold, RichText=true,
@@ -1291,7 +1064,7 @@ function HubLib:Window(p)
 			TextWrapped=true, TextXAlignment=Enum.TextXAlignment.Left, TextYAlignment=Enum.TextYAlignment.Top
 		})
 		regTheme('Text & Icon', ntitleLbl)
-
+ 
 		if ndesc ~= '' then
 			local div = inst('Frame',{Parent=textArea, LayoutOrder=1, BackgroundColor3=T['Text & Icon'], BackgroundTransparency=0.9, BorderSizePixel=0, Size=UDim2.new(1,0,0,1)})
 			regTheme('Text & Icon', div)
@@ -1303,7 +1076,7 @@ function HubLib:Window(p)
 			})
 			regTheme('Text & Icon', ndescLbl)
 		end
-
+ 
 		-- animate in
 		task.defer(function()
 			local h = textArea:FindFirstChildOfClass('UIListLayout').AbsoluteContentSize.Y + 28
@@ -1312,7 +1085,7 @@ function HubLib:Window(p)
 		end)
 		task.wait(0.35)
 		tw(progressBar, 0.3, Enum.EasingStyle.Quad, 'Out', {Size=UDim2.new(1,0,0,3)}):Play()
-
+ 
 		task.spawn(function()
 			task.wait(0.3)
 			tw(progressBar, ntime, Enum.EasingStyle.Linear, 'InOut', {Size=UDim2.new(0,0,0,3)}):Play()
@@ -1327,27 +1100,27 @@ function HubLib:Window(p)
 			end)
 		end)
 	end
-
+ 
 	-- ── Dialog ──────────────────────────────────────
 	function Win:Dialog(p)
 		if shadow:FindFirstChild('Dialog') then return end
 		local dtitle   = p.Title or 'Are you sure?'
 		local btn1data = p.Button1 or {}
 		local btn2data = p.Button2 or {}
-
+ 
 		local overlay = inst('CanvasGroup',{
 			Name='Dialog', Parent=shadow, BackgroundColor3=Color3.new(0,0,0),
 			BackgroundTransparency=0.3, BorderSizePixel=0,
 			Size=UDim2.new(1,0,1,0), GroupTransparency=1
 		})
 		corner(overlay, 17)
-
+ 
 		local box = inst('Frame',{
 			Parent=overlay, AnchorPoint=Vector2.new(0.5,0.5),
 			BackgroundTransparency=1, BorderSizePixel=0,
 			Position=UDim2.new(0.5,0,0.5,0), Size=UDim2.new(0.7,0,0,100)
 		})
-
+ 
 		local titleTxt = inst('TextLabel',{
 			Parent=box, BackgroundTransparency=1, BorderSizePixel=0,
 			Size=UDim2.new(1,0,0,50), Font=Enum.Font.GothamBold, RichText=true,
@@ -1355,10 +1128,10 @@ function HubLib:Window(p)
 			TextWrapped=true, TextXAlignment=Enum.TextXAlignment.Center
 		})
 		regTheme('Text & Icon', titleTxt)
-
+ 
 		local btnsRow = inst('Frame',{Parent=box, BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(0,0,0,55), Size=UDim2.new(1,0,0,35)})
 		list(btnsRow, Enum.FillDirection.Horizontal, Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Center, 8)
-
+ 
 		local function dialogBtn(bdata)
 			local f = inst('Frame',{Parent=btnsRow, BackgroundColor3=bdata.Color or Color3.fromRGB(60,60,60), BorderSizePixel=0, Size=UDim2.new(0,80,0,28)})
 			corner(f, 6)
@@ -1373,15 +1146,15 @@ function HubLib:Window(p)
 		end
 		dialogBtn(btn1data)
 		dialogBtn(btn2data)
-
+ 
 		tw(overlay, 0.2, Enum.EasingStyle.Linear, 'Out', {GroupTransparency=0}):Play()
 	end
-
+ 
 	-- ── Tab ─────────────────────────────────────────
 	function Win:Tab(p)
 		local tabTitle = p.Title or 'Tab'
 		local tabIcon  = p.Icon  or 'house'
-
+ 
 		local tabBtn = inst('Frame',{
 			Name='Tab', Parent=tabList, BackgroundTransparency=1, BorderSizePixel=0,
 			Size=UDim2.new(1,0,0,30)
@@ -1389,7 +1162,7 @@ function HubLib:Window(p)
 		local tabInner = inst('Frame',{Name='Func', Parent=tabBtn, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,1,0)})
 		list(tabInner, Enum.FillDirection.Horizontal, nil, Enum.VerticalAlignment.Center, 8)
 		padding(tabInner, 0, 0, 8, 0)
-
+ 
 		local tabIconImg = inst('ImageLabel',{
 			Parent=tabInner, BackgroundTransparency=1, BorderSizePixel=0,
 			Size=UDim2.new(0,18,0,18), Image=getIcon(tabIcon).Image,
@@ -1397,7 +1170,7 @@ function HubLib:Window(p)
 			ImageTransparency=0.7
 		})
 		regTheme('Text & Icon', tabIconImg)
-
+ 
 		local tabLbl = inst('TextLabel',{
 			Name='Title', Parent=tabInner, BackgroundTransparency=1, BorderSizePixel=0,
 			LayoutOrder=1, Size=UDim2.new(1,0,1,0), Font=Enum.Font.GothamBold,
@@ -1405,7 +1178,7 @@ function HubLib:Window(p)
 			TextTransparency=0.7, TextXAlignment=Enum.TextXAlignment.Left
 		})
 		regTheme('Text & Icon', tabLbl)
-
+ 
 		-- Content page
 		local page = inst('Frame',{
 			Name='InPage', Parent=contentArea, AnchorPoint=Vector2.new(0.5,0.5),
@@ -1415,7 +1188,7 @@ function HubLib:Window(p)
 		regTheme('Page', page)
 		corner(page, 10)
 		padding(page, 10, 10, 10, 10)
-
+ 
 		local pageSF = inst('ScrollingFrame',{
 			Parent=page, Active=true, BackgroundTransparency=1, BorderSizePixel=0,
 			Size=UDim2.new(1,0,1,0), ClipsDescendants=true,
@@ -1423,10 +1196,10 @@ function HubLib:Window(p)
 		})
 		local pageLayout = list(pageSF, nil, nil, nil, 5)
 		autoCanvas(pageSF, pageLayout, 5)
-
+ 
 		Win._tabs[#Win._tabs+1] = { page=page, btn=tabBtn }
 		local myIdx = #Win._tabs
-
+ 
 		-- select animation
 		local function selectTab()
 			for _, t in ipairs(Win._tabs) do
@@ -1448,26 +1221,26 @@ function HubLib:Window(p)
 				tw(selector, 0.5, Enum.EasingStyle.Exponential, 'Out', {Position=UDim2.new(0,0,0,cy)}):Play()
 			end)
 		end
-
+ 
 		click(tabBtn).MouseButton1Click:Connect(selectTab)
-
+ 
 		-- auto-select first tab
 		task.spawn(function()
 			task.wait(0.12)
 			if not Win._started and myIdx == 1 then Win._started = true; selectTab() end
 		end)
-
+ 
 		-- ── Tab API ─────────────────────────────────
 		local Tab = {}
 		local currentSection = nil
-
+ 
 		function Tab:Line()
 			inst('Frame',{
 				Name='Line', Parent=tabList, BackgroundTransparency=1, BorderSizePixel=0,
 				Size=UDim2.new(1,0,0,5)
 			})
 		end
-
+ 
 		function Tab:Section(sp)
 			local stitle = sp.Title or 'Section'
 			local wrap = inst('Frame',{
@@ -1482,7 +1255,7 @@ function HubLib:Window(p)
 			secStroke.LineJoinMode = Enum.LineJoinMode.Round
 			regTheme('Main', secStroke)
 			corner(sec, 4)
-
+ 
 			local secBtn = inst('TextButton',{
 				Parent=sec, BackgroundTransparency=1, BorderSizePixel=0,
 				Size=UDim2.new(1,0,0,22), Text=''
@@ -1494,13 +1267,13 @@ function HubLib:Window(p)
 			})
 			regTheme('Text & Icon', secLbl)
 			padding(secBtn, 0, 0, 8, 8)
-
+ 
 			local content = inst('Frame',{
 				Name='Content', Parent=sec, BackgroundTransparency=1, BorderSizePixel=0,
 				Position=UDim2.new(0,0,0,22), Size=UDim2.new(1,0,0,0), ClipsDescendants=true
 			})
 			local contentLayout = list(content, nil, nil, nil, 5)
-
+ 
 			local expanded = true
 			local function updateSectionSize()
 				local ch = contentLayout.AbsoluteContentSize.Y
@@ -1521,26 +1294,26 @@ function HubLib:Window(p)
 					content.Size = UDim2.new(1,0,0,ch)
 				end
 			end)
-
+ 
 			currentSection = content
-
+ 
 			local Sec = {}
 			function Sec:SetTitle(v) secLbl.Text = v end
-
+ 
 			-- ── Toggle ──────────────────────────────
 			function Sec:Toggle(tp)
 				local val     = tp.Value or false
 				local cb      = tp.Callback or function() end
 				local bg, api = itemBg(content, tp.Title or 'Toggle', tp.Desc or '', tp.Icon or '', 'Toggle', T)
 				api:SetRightPad(60)
-
+ 
 				local track = inst('Frame',{Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=T.Function.Toggle.False['Toggle Background'], BorderSizePixel=0, Position=UDim2.new(1,0,0.5,0), Size=UDim2.new(0,34,0,17)})
 				corner(track, 100)
 				padding(track, 2, 2, 2, 2)
 				local dot = inst('Frame',{Parent=track, AnchorPoint=Vector2.new(0,0.5), BackgroundColor3=T.Function.Toggle.False['Toggle Value'], BorderSizePixel=0, Position=UDim2.new(0,0,0.5,0), Size=UDim2.new(0,13,0,13)})
 				corner(dot, 100)
 				local rightPad = padding(bg, 0, 0, 0, 50); rightPad.PaddingRight = UDim.new(0, 50)
-
+ 
 				local function update()
 					if val then
 						api:FadeTitle(0)
@@ -1557,12 +1330,12 @@ function HubLib:Window(p)
 					track.BackgroundColor3 = val and T.Function.Toggle.True['Toggle Background'] or T.Function.Toggle.False['Toggle Background']
 					dot.BackgroundColor3   = val and T.Function.Toggle.True['Toggle Value']      or T.Function.Toggle.False['Toggle Value']
 				end)
-
+ 
 				local c = click(bg)
 				c.MouseButton1Click:Connect(function() val = not val; update() end)
 				task.delay(0.05, function() if not val then api:FadeTitle(0.7) end end)
 				task.delay(0.05, update)
-
+ 
 				local obj = {}
 				function obj:SetValue(v) val = v; update() end
 				function obj:SetTitle(v) api:SetTitle(v) end
@@ -1579,7 +1352,7 @@ function HubLib:Window(p)
 				end
 				return obj
 			end
-
+ 
 			-- ── Label ───────────────────────────────
 			function Sec:Label(lp)
 				local bg, api = itemBg(content, lp.Title or '', lp.Desc or '', lp.Icon or '', 'Label', T)
@@ -1599,20 +1372,20 @@ function HubLib:Window(p)
 				end
 				return obj
 			end
-
+ 
 			-- ── Button ──────────────────────────────
 			function Sec:Button(bp)
 				local cb = bp.Callback or function() end
 				local bg, api = itemBg(content, bp.Title or 'Button', bp.Desc or '', bp.Icon or '', 'Button', T)
 				api:FadeTitle(0); api:SetRightPad(50)
 				bg.ClipsDescendants = true
-
+ 
 				local arrowImg = inst('ImageLabel',{
 					Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundTransparency=1, BorderSizePixel=0,
 					Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,20,0,20),
 					Image='rbxassetid://14923748517', ImageTransparency=0.3
 				})
-
+ 
 				local c = click(bg)
 				c.MouseButton1Click:Connect(function()
 					ripple(bg, c)
@@ -1620,7 +1393,7 @@ function HubLib:Window(p)
 					task.delay(0.1, function() tw(bg, 0.1, Enum.EasingStyle.Back, 'Out', {Size=UDim2.new(1,0,1,0)}):Play() end)
 					pcall(cb)
 				end)
-
+ 
 				local obj = {}
 				function obj:SetTitle(v) api:SetTitle(v) end
 				function obj:SetDesc(v)  api:SetDesc(v) end
@@ -1636,7 +1409,7 @@ function HubLib:Window(p)
 				end
 				return obj
 			end
-
+ 
 			-- ── Slider ──────────────────────────────
 			function Sec:Slider(slp)
 				local min  = slp.Min      or 0
@@ -1646,7 +1419,7 @@ function HubLib:Window(p)
 				local cb   = slp.Callback or function() end
 				local bg, api = itemBg(content, slp.Title or 'Slider', slp.Desc or '', slp.Icon or '', 'Slider', T)
 				api:FadeTitle(0); api:SetRightPad(200)
-
+ 
 				-- value textbox
 				local vbox = inst('Frame',{
 					Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=T.Function.Slider['Value Background'],
@@ -1662,7 +1435,7 @@ function HubLib:Window(p)
 					Text=tostring(val), TextColor3=T['Text & Icon'], TextSize=12
 				})
 				regTheme('Text & Icon', vtb)
-
+ 
 				-- slider bar
 				local barWrap = inst('Frame',{Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,115,0,20)})
 				local barBg = inst('Frame',{Parent=barWrap, AnchorPoint=Vector2.new(0.5,0.5), BackgroundColor3=T.Function.Slider['Slider Bar'], BorderSizePixel=0, Position=UDim2.new(0.5,0,0.5,0), Size=UDim2.new(1,0,0,8)})
@@ -1675,7 +1448,7 @@ function HubLib:Window(p)
 				local circle = inst('Frame',{Parent=fill, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=T.Function.Slider['Circle Value'], BorderSizePixel=0, Position=UDim2.new(1,0,0.5,0), Size=UDim2.new(0,13,0,13)})
 				regTheme('Function.Slider.Circle Value', circle)
 				corner(circle, 100)
-
+ 
 				local function round(v, d) local f = 10^d; return math.floor(v*f+0.5)/f end
 				local function updateSlider(v)
 					v = math.clamp(round(v, rnd), min, max)
@@ -1685,9 +1458,9 @@ function HubLib:Window(p)
 					vtb.Text = tostring(v)
 					pcall(cb, v)
 				end
-
+ 
 				vtb.FocusLost:Connect(function() updateSlider(tonumber(vtb.Text) or min) end)
-
+ 
 				local dragging = false
 				local barClick = click(barWrap)
 				barClick.InputBegan:Connect(function(i)
@@ -1707,7 +1480,7 @@ function HubLib:Window(p)
 					end
 				end)
 				task.defer(function() updateSlider(val) end)
-
+ 
 				local obj = {}
 				function obj:SetValue(v) updateSlider(v) end
 				function obj:SetMin(v)   min = v; updateSlider(val) end
@@ -1726,15 +1499,15 @@ function HubLib:Window(p)
 				end
 				return obj
 			end
-
+ 
 			-- ── Dropdown ────────────────────────────
 			function Sec:Dropdown(dp)
 				local bg, api = itemBg(content, dp.Title or 'Dropdown', dp.Desc or '', dp.Icon or '', 'Dropdown', T)
 				api:FadeTitle(0); api:SetRightPad(115)
-
+ 
 				local ddHolder = inst('Frame',{Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(1,0,0.5,0), Size=UDim2.new(0,110,0.8,0)})
 				local dd = buildDropdownSelect(ddHolder, ddHolder, dp.Multi or false, dp.Callback or function() end, dp.Value, dp.List or {}, T)
-
+ 
 				local obj = {}
 				function obj:SetTitle(v) api:SetTitle(v) end
 				function obj:SetDesc(v)  api:SetDesc(v) end
@@ -1753,14 +1526,14 @@ function HubLib:Window(p)
 				end
 				return obj
 			end
-
+ 
 			-- ── Textbox ─────────────────────────────
 			function Sec:Textbox(txp)
 				local val = txp.Value or ''
 				local cb  = txp.Callback or function() end
 				local bg, api = itemBg(content, txp.Title or 'Textbox', txp.Desc or '', txp.Icon or '', 'Textbox', T)
 				api:FadeTitle(0); api:SetRightPad(145)
-
+ 
 				local tbox = inst('Frame',{
 					Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=T.Function.Textbox['Value Background'],
 					BorderSizePixel=0, Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,130,0,25)
@@ -1769,7 +1542,7 @@ function HubLib:Window(p)
 				corner(tbox, 4)
 				stroke(tbox, T.Function.Textbox['Value Stroke'], 1, 0.95)
 				padding(tbox, 0, 0, 5, 5)
-
+ 
 				local tb = inst('TextBox',{
 					Parent=tbox, BackgroundTransparency=1, BorderSizePixel=0,
 					Size=UDim2.new(0.82,0,1,0), Font=Enum.Font.GothamBold,
@@ -1782,7 +1555,7 @@ function HubLib:Window(p)
 				regTheme('Text & Icon', tb)
 				tb.FocusLost:Connect(function() if #tb.Text > 0 then pcall(cb, tb.Text) end end)
 				task.defer(function() if #val > 0 then pcall(cb, val) end end)
-
+ 
 				local obj = {}
 				function obj:SetValue(v) tb.Text = v end
 				function obj:SetTitle(v) api:SetTitle(v) end
@@ -1800,14 +1573,15 @@ function HubLib:Window(p)
 				end
 				return obj
 			end
-
+ 
 			-- ── Keybind ─────────────────────────────
 			function Sec:Keybind(kp)
 				local key = kp.Key or Enum.KeyCode.E
 				local cb  = kp.Callback or function() end
+				local onPress = kp.OnPress or function() end
 				local bg, api = itemBg(content, kp.Title or 'Keybind', kp.Desc or '', kp.Icon or '', 'Keybind', T)
 				api:SetRightPad(90)
-
+ 
 				local kbox = inst('Frame',{
 					Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=T.Function.Keybind['Value Background'],
 					BorderSizePixel=0, Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,40,0,20)
@@ -1816,7 +1590,7 @@ function HubLib:Window(p)
 				corner(kbox, 4)
 				stroke(kbox, T.Function.Keybind['Value Stroke'], 1, 0.95)
 				padding(kbox, 0, 0, 5, 5)
-
+ 
 				local ktxt = inst('TextLabel',{
 					Parent=kbox, BackgroundTransparency=1, BorderSizePixel=0,
 					Size=UDim2.new(1,0,1,0), Font=Enum.Font.GothamBold, RichText=true,
@@ -1825,30 +1599,51 @@ function HubLib:Window(p)
 					TextWrapped=true
 				})
 				regTheme('Text & Icon', ktxt)
-
+ 
 				local function adjustSize()
 					local ts = game:GetService('TextService'):GetTextSize(ktxt.Text, ktxt.TextSize, ktxt.Font, Vector2.new(1000,1000))
 					tw(kbox, 0.15, Enum.EasingStyle.Linear, 'Out', {Size=UDim2.new(0, ts.X+20, 0, 20)}):Play()
 				end
 				adjustSize()
-
+ 
 				local changing = false
-				local kbtn = inst('TextButton',{Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(1,0,0.5,0), Size=UDim2.new(0,100,0.8,0), Text='', ZIndex=2})
+				-- Dùng click trên kbox thay vì kbtn riêng để tránh bị che
+				local kbtn = click(kbox)
+				kbtn.ZIndex = 10
 				kbtn.MouseButton1Click:Connect(function()
 					if changing then return end
-					changing = true; ktxt.Text = '...'
-					local conn; conn = U.InputBegan:Connect(function(i)
-						if i.UserInputType == Enum.UserInputType.Keyboard then
-							key = i.KeyCode
-							ktxt.Text = tostring(key):gsub('Enum.KeyCode.','')
-							adjustSize(); conn:Disconnect(); pcall(cb, key)
-							task.wait(0.1); changing = false
-						end
+					changing = true
+					ktxt.Text = '...'
+					-- Visual feedback: highlight kbox
+					tw(kbox, 0.1, Enum.EasingStyle.Quad, 'Out', {BackgroundTransparency = 0.5}):Play()
+					local conn
+					conn = U.InputBegan:Connect(function(i)
+						if i.UserInputType ~= Enum.UserInputType.Keyboard then return end
+						local kc = i.KeyCode
+						if kc == Enum.KeyCode.LeftShift or kc == Enum.KeyCode.RightShift
+						or kc == Enum.KeyCode.LeftControl or kc == Enum.KeyCode.RightControl
+						or kc == Enum.KeyCode.LeftAlt or kc == Enum.KeyCode.RightAlt then return end
+						key = kc
+						ktxt.Text = tostring(key):gsub('Enum.KeyCode.','')
+						adjustSize()
+						conn:Disconnect()
+						changing = false
+						tw(kbox, 0.1, Enum.EasingStyle.Quad, 'Out', {BackgroundTransparency = 1}):Play()
+						pcall(cb, key)
 					end)
 				end)
-
+ 
+				-- OnPress: lắng nghe khi bấm phím
+				U.InputBegan:Connect(function(i)
+					if i.UserInputType ~= Enum.UserInputType.Keyboard then return end
+					if i.KeyCode == key and not changing then
+						pcall(onPress)
+					end
+				end)
+ 
 				local obj = {}
 				function obj:SetKey(v) key=v; ktxt.Text=tostring(v):gsub('Enum.KeyCode.',''); adjustSize(); pcall(cb,v) end
+				function obj:SetOnPress(v) onPress = v end
 				function obj:SetTitle(v) api:SetTitle(v) end
 				function obj:SetDesc(v)  api:SetDesc(v) end
 				function obj:SetVisible(v) bg.Parent.Visible = v end
@@ -1863,21 +1658,21 @@ function HubLib:Window(p)
 				end
 				return obj
 			end
-
+ 
 			-- ── ColorPicker ─────────────────────────
 			function Sec:ColorPicker(cpp)
 				local val = cpp.Value or Color3.fromRGB(255,255,255)
 				local cb  = cpp.Callback or function() end
 				local bg, api = itemBg(content, cpp.Title or 'Color', cpp.Desc or '', cpp.Icon or '', 'Color Picker', T)
 				api:FadeTitle(0); api:SetRightPad(40)
-
+ 
 				local dot = inst('Frame',{
 					Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=val,
 					BorderSizePixel=0, Position=UDim2.new(1,-10,0.5,0), Size=UDim2.new(0,20,0,20)
 				})
 				corner(dot, 100)
 				local glow = inst('ImageLabel',{Parent=dot, AnchorPoint=Vector2.new(0.5,0.5), BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(0.5,0,0.5,0), Size=UDim2.new(1.5,0,1.5,0), Image='rbxassetid://105506802034513', ImageColor3=val, ImageTransparency=0.2})
-
+ 
 				-- Color picker panel
 				local panel = inst('Frame',{
 					Name='ColorPanel', Parent=ScreenGui, BackgroundColor3=T.Function['Color Picker']['Color Select'].Background,
@@ -1889,33 +1684,33 @@ function HubLib:Window(p)
 				regTheme('Function.Color Picker.Color Select.UIStroke', ps)
 				padding(panel, 5, 5, 10, 10)
 				drag(panel, panel)
-
+ 
 				local colorPad = inst('Frame',{Parent=panel, BackgroundColor3=Color3.new(1,0,0), BorderSizePixel=0, Position=UDim2.new(0,0,0,25), Size=UDim2.new(0,80,0,80), ZIndex=10})
 				corner(colorPad, 3)
 				inst('ImageLabel',{Parent=colorPad, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,1,0), Image='rbxassetid://4155801252', ZIndex=10})
 				local colorSel = inst('ImageLabel',{Parent=colorPad, AnchorPoint=Vector2.new(0.5,0.5), BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(0,12,0,12), Image='http://www.roblox.com/asset/?id=4805639000', ScaleType=Enum.ScaleType.Fit, ZIndex=11})
-
+ 
 				local hueBar = inst('Frame',{Parent=panel, BackgroundColor3=Color3.new(1,1,1), BorderSizePixel=0, Position=UDim2.new(0.47,0,0,25), Size=UDim2.new(0,10,0,80)})
 				corner(hueBar, 100)
 				local hueGrad = inst('UIGradient',{Parent=hueBar, Rotation=270, Color=ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromRGB(255,0,4)),ColorSequenceKeypoint.new(0.2,Color3.fromRGB(234,255,0)),ColorSequenceKeypoint.new(0.4,Color3.fromRGB(21,255,0)),ColorSequenceKeypoint.new(0.6,Color3.fromRGB(0,255,255)),ColorSequenceKeypoint.new(0.8,Color3.fromRGB(0,17,255)),ColorSequenceKeypoint.new(0.9,Color3.fromRGB(255,0,251)),ColorSequenceKeypoint.new(1,Color3.fromRGB(255,0,4))}})
 				local hueSel = inst('ImageLabel',{Parent=hueBar, AnchorPoint=Vector2.new(0.5,0.5), BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(0.5,0,1,0), Size=UDim2.new(0,12,0,12), Image='http://www.roblox.com/asset/?id=4805639000'})
-
+ 
 				local titleLbl2 = inst('TextLabel',{Parent=panel, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,0,22), Font=Enum.Font.GothamBold, Text=cpp.Title or 'Color', TextColor3=T['Text & Icon'], TextSize=12, TextXAlignment=Enum.TextXAlignment.Left})
 				regTheme('Text & Icon', titleLbl2)
-
+ 
 				-- Hex input
 				local hexBox = inst('Frame',{Parent=panel, AnchorPoint=Vector2.new(1,0), BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(1,0,0,25), Size=UDim2.new(0,80,0,22)})
 				local hexStroke = stroke(hexBox, Color3.new(1,1,1), 1, 0.9); corner(hexBox, 4)
 				regTheme('Function.Color Picker.Color Select.UIStroke', hexStroke)
 				local hexTB = inst('TextBox',{Parent=hexBox, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,1,0), Font=Enum.Font.Gotham, PlaceholderText='#FFFFFF', Text='#FFFFFF', TextColor3=T['Text & Icon'], TextSize=9, TextTruncate=Enum.TextTruncate.AtEnd})
 				regTheme('Text & Icon', hexTB)
-
+ 
 				local H, S, V = Color3.toHSV(val)
 				local lastH = -1
 				local RS = game:GetService('RunService')
 				local Mouse = game:GetService('Players').LocalPlayer:GetMouse()
 				local colorInput, hueInput
-
+ 
 				local function updatePicker()
 					local color = Color3.fromHSV(H, S, V)
 					dot.BackgroundColor3 = color; glow.ImageColor3 = color
@@ -1926,7 +1721,7 @@ function HubLib:Window(p)
 					if lastH ~= H then lastH=H; tw(hueSel, 0.1, Enum.EasingStyle.Exponential, 'Out', {Position=UDim2.new(0.5,0,1-H,0)}):Play() end
 					pcall(cb, math.floor(r), math.floor(g), math.floor(b))
 				end
-
+ 
 				hexTB.FocusLost:Connect(function()
 					local hex = hexTB.Text:match('^#[%x]+$')
 					if hex and #hex == 7 then
@@ -1937,7 +1732,7 @@ function HubLib:Window(p)
 						updatePicker()
 					end
 				end)
-
+ 
 				local isOpen = false
 				local function openPicker()
 					isOpen = true
@@ -1951,9 +1746,9 @@ function HubLib:Window(p)
 					tw(panel, 0.15, Enum.EasingStyle.Exponential, 'Out', {Size=UDim2.new(0,200,0,0)}):Play()
 					tw(ps, 0.15, Enum.EasingStyle.Linear, 'Out', {Transparency=0.95}):Play()
 				end
-
+ 
 				click(bg).MouseButton1Click:Connect(function() if isOpen then closePicker() else openPicker() end end)
-
+ 
 				U.InputBegan:Connect(function(inp)
 					if inp.UserInputType == Enum.UserInputType.MouseButton1 then
 						local b2, s2 = panel.AbsolutePosition, panel.AbsoluteSize
@@ -1961,7 +1756,7 @@ function HubLib:Window(p)
 						if mx < b2.X or mx > b2.X+s2.X or my < b2.Y-21 or my > b2.Y+s2.Y then closePicker() end
 					end
 				end)
-
+ 
 				local function startColorDrag(input)
 					if colorInput then colorInput:Disconnect() end
 					colorInput = RS.RenderStepped:Connect(function()
@@ -1979,14 +1774,14 @@ function HubLib:Window(p)
 						updatePicker()
 					end)
 				end
-
+ 
 				click(colorPad).InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then startColorDrag(i) end end)
 				click(colorPad).InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 and colorInput then colorInput:Disconnect() end end)
 				click(hueBar).InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then startHueDrag(i) end end)
 				click(hueBar).InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 and hueInput then hueInput:Disconnect() end end)
-
+ 
 				task.defer(function() H,S,V = Color3.toHSV(val); updatePicker() end)
-
+ 
 				local obj = {}
 				function obj:SetValue(colorTbl)
 					local newC = Color3.fromRGB(colorTbl.R or 255, colorTbl.G or 255, colorTbl.B or 255)
@@ -2006,7 +1801,7 @@ function HubLib:Window(p)
 				end
 				return obj
 			end
-
+ 
 			-- ── Logger ──────────────────────────────
 			function Sec:Logger(lgp)
 				local boxSize = lgp.Size or UDim2.new(1,0,0,180)
@@ -2028,10 +1823,10 @@ function HubLib:Window(p)
 				function L:Clear() for _, c in ipairs(logSF:GetChildren()) do if c:IsA('TextLabel') then c:Destroy() end end end
 				return L
 			end
-
+ 
 			-- ── ImageButton (tự wrap + scroll dọc) ──────
 			local _imgGrid, _imgGridWrap
-
+ 
 			function Sec:ImageButton(ip)
 				local imgId     = ip.Image    or 'rbxassetid://0'
 				local tipTitle  = ip.Title    or ''
@@ -2041,7 +1836,7 @@ function HubLib:Window(p)
 				local cb        = ip.Callback or function() end
 				local iW        = imgSize.X.Offset
 				local iH        = imgSize.Y.Offset
-
+ 
 				-- Tạo container lần đầu
 				if not _imgGrid or not _imgGrid.Parent then
 					-- ScrollingFrame dọc, chiều cao tự tăng theo nội dung
@@ -2058,7 +1853,7 @@ function HubLib:Window(p)
 						AutomaticCanvasSize  = Enum.AutomaticSize.Y,
 					})
 					padding(_imgGridWrap, 4, 4, 6, 6)
-
+ 
 					_imgGrid = Instance.new('UIGridLayout')
 					_imgGrid.CellSize          = UDim2.new(0, iW, 0, iH)
 					_imgGrid.CellPadding       = UDim2.new(0, gap, 0, gap)
@@ -2067,14 +1862,14 @@ function HubLib:Window(p)
 					_imgGrid.VerticalAlignment = Enum.VerticalAlignment.Top
 					_imgGrid.SortOrder         = Enum.SortOrder.LayoutOrder
 					_imgGrid.Parent            = _imgGridWrap
-
+ 
 					-- tự resize chiều cao container theo số hàng
 					_imgGrid:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
 						local h = math.min(_imgGrid.AbsoluteContentSize.Y + 12, (iH + gap) * 3 + 12) -- tối đa 3 hàng rồi scroll
 						_imgGridWrap.Size = UDim2.new(1, 0, 0, h)
 					end)
 				end
-
+ 
 				local btn = inst('ImageButton', {
 					Name            = 'ImgBtn',
 					Parent          = _imgGridWrap,
@@ -2085,7 +1880,7 @@ function HubLib:Window(p)
 					ZIndex          = 5,
 				})
 				local btnStroke = stroke(btn, T.Main, 1.5, 0.6)
-
+ 
 				-- Ripple frame bên trong
 				local rippleFrame = inst('Frame', {
 					Parent               = btn,
@@ -2096,10 +1891,10 @@ function HubLib:Window(p)
 					ZIndex               = 6,
 				})
 				corner(rippleFrame, 8)
-
+ 
 				local tip, lblTitle, lblAuthor = makeTooltip(ScreenGui, tipTitle, tipAuthor, T)
 				local Mouse = game:GetService('Players').LocalPlayer:GetMouse()
-
+ 
 				-- Hover: glow stroke sáng lên
 				btn.MouseEnter:Connect(function()
 					tip.Visible = true
@@ -2111,25 +1906,25 @@ function HubLib:Window(p)
 					tw(btnStroke, 0.15, Enum.EasingStyle.Quad, 'Out', {Transparency = 0.6, Thickness = 1.5}):Play()
 					tw(btn, 0.15, Enum.EasingStyle.Quad, 'Out', {ImageTransparency = 0}):Play()
 				end)
-
+ 
 				game:GetService('RunService').RenderStepped:Connect(function()
 					if tip.Visible then
 						tip.Position = UDim2.new(0, Mouse.X + 14, 0, Mouse.Y + 14)
 					end
 				end)
-
+ 
 				btn.MouseButton1Down:Connect(function()
 					-- scale nhỏ lại
 					tw(btn, 0.08, Enum.EasingStyle.Back, 'In', {Size = UDim2.new(0, iW*0.88, 0, iH*0.88)}):Play()
 					-- stroke flash
 					tw(btnStroke, 0.08, Enum.EasingStyle.Quad, 'Out', {Transparency = 0, Thickness = 3}):Play()
 				end)
-
+ 
 				btn.MouseButton1Click:Connect(function()
 					-- scale về
 					tw(btn, 0.18, Enum.EasingStyle.Elastic, 'Out', {Size = imgSize}):Play()
 					tw(btnStroke, 0.2, Enum.EasingStyle.Quad, 'Out', {Transparency = 0.6, Thickness = 1.5}):Play()
-
+ 
 					-- ripple
 					local rx = Mouse.X - btn.AbsolutePosition.X
 					local ry = Mouse.Y - btn.AbsolutePosition.Y
@@ -2151,10 +1946,10 @@ function HubLib:Window(p)
 					})
 					t.Completed:Connect(function() rp:Destroy() end)
 					t:Play()
-
+ 
 					pcall(cb)
 				end)
-
+ 
 				local obj = {}
 				function obj:SetImage(v)   btn.Image = v end
 				function obj:SetTitle(v)   lblTitle.Text = v end
@@ -2167,7 +1962,7 @@ function HubLib:Window(p)
 				end
 				return obj
 			end
-
+ 
 			-- ── ImageRow (hàng ngang nhiều ảnh) ────────
 			function Sec:ImageRow(rp)
 				-- rp.Items = { {Image, Title, Author, Callback}, ... }
@@ -2177,7 +1972,7 @@ function HubLib:Window(p)
 				local imgSize = rp.Size    or UDim2.new(0, 52, 0, 52)
 				local gap     = rp.Gap     or 8
 				local rowH    = imgSize.Y.Offset + 16
-
+ 
 				local row = inst('Frame', {
 					Name='ImageRow', Parent=content,
 					BackgroundTransparency=1, BorderSizePixel=0,
@@ -2196,15 +1991,15 @@ function HubLib:Window(p)
 				local layout = list(sf, Enum.FillDirection.Horizontal, nil, Enum.VerticalAlignment.Center, gap)
 				padding(sf, 4, 4, 8, 8)
 				autoCanvas(sf, layout, 16)
-
-				local Mouse = game:GetService('Players').LocalPlayer:GetMouse()
-
+ 
+				local Mouse = game.GetService('Players').LocalPlayer:GetMouse()
+ 
 				for _, item in ipairs(items) do
 					local iImg  = item.Image    or 'rbxassetid://0'
 					local iName = item.Title    or ''
 					local iAuth = item.Author   or ''
 					local iCb   = item.Callback or function() end
-
+ 
 					local btn = inst('ImageButton', {
 						Name='ImgBtn', Parent=sf,
 						Size=imgSize,
@@ -2213,18 +2008,18 @@ function HubLib:Window(p)
 						ZIndex=5,
 					})
 					stroke(btn, T.Main, 1.5, 0.6)
-
+ 
 					local tip, lblTitle, lblAuthor = makeTooltip(ScreenGui, iName, iAuth, T)
-
+ 
 					btn.MouseEnter:Connect(function() tip.Visible = true end)
 					btn.MouseLeave:Connect(function() tip.Visible = false end)
-
+ 
 					game:GetService('RunService').RenderStepped:Connect(function()
 						if tip.Visible then
 							tip.Position = UDim2.new(0, Mouse.X + 14, 0, Mouse.Y + 14)
 						end
 					end)
-
+ 
 					btn.MouseButton1Click:Connect(function()
 						tw(btn, 0.08, Enum.EasingStyle.Back, 'In',  {Size=UDim2.new(0, imgSize.X.Offset*0.9, 0, imgSize.Y.Offset*0.9)}):Play()
 						task.delay(0.08, function()
@@ -2234,10 +2029,10 @@ function HubLib:Window(p)
 					end)
 				end
 			end
-
+ 
 			return Sec
 		end
-
+ 
 		-- Allow creating elements directly on tab without section
 		function Tab:Toggle(p)   return (currentSection and error or function() local s={} setmetatable(s,{__index=Tab}) currentSection=pageSF return Tab:Section({Title=''}):Toggle(p) end)() end
 		function Tab:Label(p)    local s = Tab:Section({Title=''}); return s:Label(p) end
@@ -2247,7 +2042,7 @@ function HubLib:Window(p)
 		function Tab:Textbox(p)  local s = Tab:Section({Title=''}); return s:Textbox(p) end
 		function Tab:Keybind(p)  local s = Tab:Section({Title=''}); return s:Keybind(p) end
 		function Tab:ColorPicker(p) local s = Tab:Section({Title=''}); return s:ColorPicker(p) end
-
+ 
 		function Tab:Delete()
 			-- Xoá tab khỏi danh sách _tabs
 			for i, t in ipairs(Win._tabs) do
@@ -2276,10 +2071,10 @@ function HubLib:Window(p)
 				end
 			end
 		end
-
+ 
 		return Tab
 	end
-
+ 
 	return Win
 end
 
