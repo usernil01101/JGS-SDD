@@ -3,7 +3,7 @@ return {
 	InGame = { -- Arsenal
 		['286090429'] = {
 			Title    = 'Arsual v.52',
-			Author   = 'by fr¿eze08',
+			Author   = 'fr¿eze08',
 			Callback =function()
 				local sus,err = pcall(function()
 					loadstring(game:HttpGet(('https://raw.githubusercontent.com/usernil01101/JGS-SDD/refs/heads/main/cache%20/Arsenal/Arsual.luau'),true))()
@@ -15,7 +15,7 @@ return {
 		
 		['10449761463'] = { -- strongest
 			Title    = 'Trashcan Man',
-			Author   = 'by yes1nt',
+			Author   = 'yes1nt',
 			Callback =function()
 				local sus,err = pcall(function()
 					loadstring(game:HttpGet(('https://raw.githubusercontent.com/usernil01101/JGS-SDD/refs/heads/main/cache%20/Strongest%20Battlegrounds/Trashcan%20Man.luau'),true))()
