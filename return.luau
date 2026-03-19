@@ -1,6 +1,6 @@
 return {
 	InGame = {
-		['286090429'] = { -- Arsenal — 1 script
+		['286090429'] = {
 			Title    = 'Arsual v.52',
 			Author   = 'fr¿eze08',
 			Callback = function()
@@ -10,7 +10,7 @@ return {
 			end,
 		},
 
-		['10449761463'] = { -- Strongest 
+		['10449761463'] = { 
 			{
 				Title    = 'Trashcan Man',
 				Author   = 'yes1nt',
@@ -21,7 +21,7 @@ return {
 				end,
 			},
 			{
-				Title    = 'Script 2',
+				Title    = 'Standupe',
 				Author   = 'dh_0dk36',
 				Callback = function()
 					pcall(function()
@@ -35,9 +35,26 @@ return {
 	Universal = {
 		{
 			Title    = 'Infinite Yield',
-			Author   = 'Unknown',
+			Author   = 'EdgeIY',
+			Image    = 'rbxasset://textures/explosion.png',
 			Callback = function()
 				loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source', true))()
+			end,
+		},
+		{
+			Title    = 'Fling All',
+			Author   = 'meth0x01',
+			Image    = 'rbxasset://textures/explosion.png',
+			Callback = function()
+				loadstring(game:HttpGet('https://raw.githubusercontent.com/usernil01101/JGS-SDD/refs/heads/main/cache%20/Universe/flingall.luau', true))()
+			end,
+		},
+		{
+			Title    = 'Invisible',
+			Author   = 'meth0x01',
+			Image    = 'rbxasset://textures/explosion.png',
+			Callback = function()
+				loadstring(game:HttpGet('https://raw.githubusercontent.com/usernil01101/JGS-SDD/refs/heads/main/cache%20/Universe/invisiblev1.luau', true))()
 			end,
 		},
 	},
