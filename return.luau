@@ -1,3 +1,6 @@
+
+
+
 return {
 	InGame = {
 		['286090429'] = {
@@ -35,7 +38,7 @@ return {
 	Universal = {
 		{
 			Title    = 'Infinite Yield',
-			Author   = 'EdgeIY',
+			Author   = 'Edge // Zwolf // Moon // Hunter // Toon // Peyton // ATP',
 			Image    = 'rbxasset://textures/explosion.png',
 			Callback = function()
 				loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source', true))()
