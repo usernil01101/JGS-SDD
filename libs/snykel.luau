@@ -961,7 +961,7 @@ function HubLib:Window(p)
 	-- Icon bên trong miniIcon
 	local miniIconImg = inst('ImageLabel', {
 		Parent              = miniIcon,
-		Size                = UDim2.fromScale(0.6, 0.6),
+		Size                = UDim2.fromScale(1, 1),
 		Position            = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint         = Vector2.new(0.5, 0.5),
 		BackgroundTransparency = 1,
