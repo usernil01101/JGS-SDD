@@ -979,11 +979,12 @@ function HubLib:Window(p)
 		Size            = UDim2.fromOffset(50, 50),
 		Position        = UDim2.new(0, 20, 0.5, -25),
 		BackgroundColor3 = T.Main,
+		BackgroundTransparency = 1,
 		Visible         = false,
 		ZIndex          = 100,
 		BorderSizePixel = 0,
 	})
-	do local c = miniIcon:FindFirstChildOfClass('UICorner'); if c then c.CornerRadius = UDim.new(0,100) end end
+
 	stroke(miniIcon, Color3.new(1,1,1), 2, 0.7)
 
 	-- Icon bên trong miniIcon
