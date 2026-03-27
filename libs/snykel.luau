@@ -382,7 +382,6 @@ local function makeTooltip(parent, title, author, T)
 end
 
 -- ─── Icon loader ────────────────────────────────────
-local IconList
 local function loadIcons()
 	if IconList then return end
 	local ok, res = pcall(function()
@@ -392,18 +391,47 @@ local function loadIcons()
 end
 
 local function getIcon(i)
+	-- 1. Nếu input là bảng (đã qua xử lý) thì trả về luôn
+	if type(i) == "table" then return i end
+
+	-- 2. Ưu tiên kiểm tra trong Spritesheet IconList
 	loadIcons()
-	if IconList and type(i) == 'string' then
+	if IconList and type(i) == 'string' and IconList.Icons then
 		local d = IconList.Icons[i]
 		if d then
 			local ss = IconList.Spritesheets[tostring(d.Image)]
-			if ss then return { Image=ss, ImageRectSize=d.ImageRectSize, ImageRectOffset=d.ImageRectPosition } end
+			if ss then 
+				return { 
+					Image = ss, 
+					ImageRectSize = d.ImageRectSize, 
+					ImageRectOffset = d.ImageRectPosition 
+				} 
+			end
 		end
 	end
-	local id = type(i) == 'number' and ('rbxassetid://'..i) or (type(i)=='string' and not i:find('rbxassetid://') and ('rbxassetid://'..i) or (type(i)=='string' and i or nil))
-	return { Image = id or 'rbxassetid://0', ImageRectSize=Vector2.new(0,0), ImageRectOffset=Vector2.new(0,0) }
-end
 
+	-- 3. Xử lý ID, URL hoặc Path từ getcustomasset
+	local id = 'rbxassetid://0'
+
+	if type(i) == 'number' then
+		id = 'rbxassetid://' .. i
+	elseif type(i) == 'string' then
+		-- Nếu là link, path filesystem (từ getcustomasset), hoặc id sẵn có
+		if i:find('rbxassetid://') or i:find('http') or i:find('filesystem:') or i:find('asset%:') then
+			id = i
+		else
+			-- Nếu chỉ là số dạng string "12345"
+			id = 'rbxassetid://' .. i
+		end
+	end
+
+	-- QUAN TRỌNG: Với ảnh local, RectSize phải là Vector2.new(0,0)
+	return { 
+		Image = id, 
+		ImageRectSize = Vector2.new(0,0), 
+		ImageRectOffset = Vector2.new(0,0) 
+	}
+end
 -- ─── Item background helper ─────────────────────────
 local function itemBg(parent, title, desc, icon, funcType, T)
 	local wrap = inst('Frame',{
