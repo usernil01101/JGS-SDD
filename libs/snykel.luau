@@ -2567,6 +2567,7 @@ function HubLib:KeySystem(p)
 
 		if playerGui then
 			mainWorkInkUI = playerGui:FindFirstChild("MainWorkInkUI")
+			mainWorkInkUI.WorkingFrame.Visible = false
 			errorWorkInkUI = playerGui:FindFirstChild("ErrorWorkInkUI")
 		end
 
