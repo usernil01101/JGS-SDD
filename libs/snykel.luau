@@ -2550,8 +2550,14 @@ function HubLib:KeySystem(p)
 	local maxAttempts = p.MaxAttempts or 5
 
 	-- ===== LINK WORKINK =====
+	-- ===== LINK WORKINK =====
+	local currentWorkinkInputConn = nil
+	local currentWorkinkInput = nil
+	local syncing = false
+
 	local function findDescendantByName(parent, targetName)
 		if not parent then return nil end
+		if parent.Name == targetName then return parent end
 		for _, obj in ipairs(parent:GetDescendants()) do
 			if obj.Name == targetName then
 				return obj
@@ -2562,12 +2568,12 @@ function HubLib:KeySystem(p)
 
 	local function getWorkinkRefs()
 		local playerGui = player:FindFirstChild("PlayerGui")
+
 		local mainWorkInkUI = nil
 		local errorWorkInkUI = nil
 
 		if playerGui then
 			mainWorkInkUI = playerGui:FindFirstChild("MainWorkInkUI")
-			mainWorkInkUI.WorkingFrame.Visible = false
 			errorWorkInkUI = playerGui:FindFirstChild("ErrorWorkInkUI")
 		end
 
@@ -2578,28 +2584,31 @@ function HubLib:KeySystem(p)
 			errorWorkInkUI = CoreGui:FindFirstChild("ErrorWorkInkUI")
 		end
 
-		local workinkInput = nil
-		local workinkSubmit = nil
+		local workingFrame = mainWorkInkUI and findDescendantByName(mainWorkInkUI, "WorkingFrame") or nil
+		local workinkInput = workingFrame and findDescendantByName(workingFrame, "KeyInput") or nil
+		local workinkSubmit = workingFrame and findDescendantByName(workingFrame, "SubmitButton") or nil
 
-		if mainWorkInkUI then
-			local workingFrame = findDescendantByName(mainWorkInkUI, "WorkingFrame")
-			if workingFrame then
-				workinkInput = findDescendantByName(workingFrame, "KeyInput")
-				workinkSubmit = findDescendantByName(workingFrame, "SubmitButton")
-			end
-		end
-
-		return mainWorkInkUI, errorWorkInkUI, workinkInput, workinkSubmit
+		return mainWorkInkUI, errorWorkInkUI, workingFrame, workinkInput, workinkSubmit
 	end
 
-	local syncing = false
-
 	local function syncToWorkink()
-		local _, _, workinkInput = getWorkinkRefs()
+		local _, _, _, workinkInput = getWorkinkRefs()
 		if syncing then return end
+
 		if workinkInput and workinkInput:IsA("TextBox") then
 			syncing = true
 			workinkInput.Text = inputBox.Text
+			syncing = false
+		end
+	end
+
+	local function syncFromWorkink()
+		local _, _, _, workinkInput = getWorkinkRefs()
+		if syncing then return end
+
+		if workinkInput and workinkInput:IsA("TextBox") then
+			syncing = true
+			inputBox.Text = workinkInput.Text
 			syncing = false
 		end
 	end
@@ -2615,15 +2624,14 @@ function HubLib:KeySystem(p)
 		if not btn then return false end
 
 		local ok = pcall(function()
-			local sus,err = pcall(function()firesignal(btn.MouseButton1Click) end)
-						
+			firesignal(btn.MouseButton1Click)
 		end)
 
 		return ok
 	end
 
 	local function submitWorkink()
-		local _, _, _, workinkSubmit = getWorkinkRefs()
+		local _, _, _, _, workinkSubmit = getWorkinkRefs()
 		syncToWorkink()
 
 		if workinkSubmit then
@@ -2631,8 +2639,37 @@ function HubLib:KeySystem(p)
 		end
 	end
 
+	local function hookWorkinkInput()
+		local _, _, _, workinkInput = getWorkinkRefs()
+
+		if currentWorkinkInputConn and currentWorkinkInput ~= workinkInput then
+			currentWorkinkInputConn:Disconnect()
+			currentWorkinkInputConn = nil
+			currentWorkinkInput = nil
+		end
+
+		if workinkInput and workinkInput:IsA("TextBox") and currentWorkinkInput ~= workinkInput then
+			currentWorkinkInput = workinkInput
+			currentWorkinkInputConn = workinkInput:GetPropertyChangedSignal("Text"):Connect(function()
+				syncFromWorkink()
+			end)
+		end
+	end
+
+	-- text trong thư viện đổi -> sync sang workink ngay
 	inputBox:GetPropertyChangedSignal("Text"):Connect(function()
 		syncToWorkink()
+	end)
+
+	-- vòng lặp luôn dò và hook lại nếu workink được tạo lại / đổi object
+	task.spawn(function()
+		while sg and sg.Parent do
+			pcall(function()
+				hookWorkinkInput()
+				syncToWorkink()
+			end)
+			task.wait(0.15)
+		end
 	end)
 
 	local function checkKey()
@@ -2662,6 +2699,10 @@ function HubLib:KeySystem(p)
 				local fade = tw(card, 0.2, Enum.EasingStyle.Back, 'In', {GroupTransparency = 1})
 				fade:Play()
 				fade.Completed:Connect(function()
+					if currentWorkinkInputConn then
+						currentWorkinkInputConn:Disconnect()
+						currentWorkinkInputConn = nil
+					end
 					sg:Destroy()
 					pcall(onSuccess)
 				end)
@@ -2676,6 +2717,10 @@ function HubLib:KeySystem(p)
 			if attempts >= maxAttempts then
 				statusLbl.Text = 'False key! Returning'
 				task.delay(1.5, function()
+					if currentWorkinkInputConn then
+						currentWorkinkInputConn:Disconnect()
+						currentWorkinkInputConn = nil
+					end
 					sg:Destroy()
 					pcall(onFail)
 				end)
