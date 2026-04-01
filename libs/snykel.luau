@@ -2345,7 +2345,9 @@ function HubLib:KeySystem(p)
 	local validKeys = type(key) == 'table' and key or { key }
 
 	local guiParent
-	pcall(function() guiParent = CoreGui end)
+	pcall(function()
+		guiParent = CoreGui
+	end)
 	if not guiParent then
 		guiParent = player:WaitForChild('PlayerGui')
 	end
@@ -2443,10 +2445,10 @@ function HubLib:KeySystem(p)
 	})
 
 	local inputWrap = inst('Frame', {
-		Parent               = cardInner,
-		BackgroundColor3     = HubLib.Theme.Page,
-		BorderSizePixel      = 0,
-		Size                 = UDim2.new(1, 0, 0, 36),
+		Parent           = cardInner,
+		BackgroundColor3 = HubLib.Theme.Page,
+		BorderSizePixel  = 0,
+		Size             = UDim2.new(1, 0, 0, 36),
 	})
 	corner(inputWrap, 8)
 	stroke(inputWrap, HubLib.Theme.Main, 1, 0.8)
@@ -2531,15 +2533,21 @@ function HubLib:KeySystem(p)
 				setclipboard(getKeyLink)
 			end
 
-			if syn and syn.request or (http and http.request) then
+			if syn and syn.request then
 				pcall(function()
 					syn.request({Url = getKeyLink, Method = 'GET'})
+				end)
+			elseif http and http.request then
+				pcall(function()
+					http.request({Url = getKeyLink, Method = 'GET'})
 				end)
 			end
 
 			getKeyBtn.Text = 'Copy link!'
 			task.delay(2, function()
-				getKeyBtn.Text = 'Get Key'
+				if getKeyBtn and getKeyBtn.Parent then
+					getKeyBtn.Text = 'Get Key'
+				end
 			end)
 		end)
 	end
@@ -2549,15 +2557,16 @@ function HubLib:KeySystem(p)
 	local attempts = 0
 	local maxAttempts = p.MaxAttempts or 5
 
-	-- ===== LINK WORKINK =====
-	-- ===== LINK WORKINK =====
-	local currentWorkinkInputConn = nil
-	local currentWorkinkInput = nil
+	-- ===== WORKINK LINK / AUTO DETECT =====
 	local syncing = false
+	local currentWorkinkInput = nil
+	local currentWorkinkInputConn = nil
 
 	local function findDescendantByName(parent, targetName)
 		if not parent then return nil end
-		if parent.Name == targetName then return parent end
+		if parent.Name == targetName then
+			return parent
+		end
 		for _, obj in ipairs(parent:GetDescendants()) do
 			if obj.Name == targetName then
 				return obj
@@ -2621,10 +2630,18 @@ function HubLib:KeySystem(p)
 	end
 
 	local function fireButton(btn)
-		if not btn then return false end
+		if not btn then
+			return false
+		end
 
 		local ok = pcall(function()
-			firesignal(btn.MouseButton1Click)
+			if getconnections then
+				for _, c in ipairs(getconnections(btn.MouseButton1Click)) do
+					c:Fire()
+				end
+			else
+				error("getconnections not supported")
+			end
 		end)
 
 		return ok
@@ -2656,12 +2673,10 @@ function HubLib:KeySystem(p)
 		end
 	end
 
-	-- text trong thư viện đổi -> sync sang workink ngay
 	inputBox:GetPropertyChangedSignal("Text"):Connect(function()
 		syncToWorkink()
 	end)
 
-	-- vòng lặp luôn dò và hook lại nếu workink được tạo lại / đổi object
 	task.spawn(function()
 		while sg and sg.Parent do
 			pcall(function()
@@ -2669,6 +2684,12 @@ function HubLib:KeySystem(p)
 				syncToWorkink()
 			end)
 			task.wait(0.15)
+		end
+
+		if currentWorkinkInputConn then
+			currentWorkinkInputConn:Disconnect()
+			currentWorkinkInputConn = nil
+			currentWorkinkInput = nil
 		end
 	end)
 
@@ -2696,12 +2717,15 @@ function HubLib:KeySystem(p)
 			stroke(inputWrap, Color3.fromRGB(80, 220, 100), 1.5, 0)
 
 			task.delay(0.8, function()
+				if not (sg and sg.Parent) then return end
+
 				local fade = tw(card, 0.2, Enum.EasingStyle.Back, 'In', {GroupTransparency = 1})
 				fade:Play()
 				fade.Completed:Connect(function()
 					if currentWorkinkInputConn then
 						currentWorkinkInputConn:Disconnect()
 						currentWorkinkInputConn = nil
+						currentWorkinkInput = nil
 					end
 					sg:Destroy()
 					pcall(onSuccess)
@@ -2720,8 +2744,11 @@ function HubLib:KeySystem(p)
 					if currentWorkinkInputConn then
 						currentWorkinkInputConn:Disconnect()
 						currentWorkinkInputConn = nil
+						currentWorkinkInput = nil
 					end
-					sg:Destroy()
+					if sg and sg.Parent then
+						sg:Destroy()
+					end
 					pcall(onFail)
 				end)
 			else
@@ -2730,6 +2757,7 @@ function HubLib:KeySystem(p)
 				local origPos = card.Position
 				for i = 1, 4 do
 					task.delay(i * 0.05, function()
+						if not (card and card.Parent) then return end
 						local offset = (i % 2 == 0) and 6 or -6
 						tw(card, 0.05, Enum.EasingStyle.Linear, 'InOut', {
 							Position = UDim2.new(
@@ -2743,14 +2771,18 @@ function HubLib:KeySystem(p)
 				end
 
 				task.delay(0.3, function()
-					tw(card, 0.05, Enum.EasingStyle.Linear, 'InOut', {
-						Position = origPos
-					}):Play()
+					if card and card.Parent then
+						tw(card, 0.05, Enum.EasingStyle.Linear, 'InOut', {
+							Position = origPos
+						}):Play()
+					end
 				end)
 
 				stroke(inputWrap, Color3.fromRGB(255, 80, 80), 1.5, 0)
 				task.delay(1, function()
-					stroke(inputWrap, HubLib.Theme.Main, 1, 0.8)
+					if inputWrap and inputWrap.Parent then
+						stroke(inputWrap, HubLib.Theme.Main, 1, 0.8)
+					end
 				end)
 			end
 		end
