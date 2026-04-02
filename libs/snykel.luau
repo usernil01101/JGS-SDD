@@ -1,4 +1,4 @@
---new3
+
 local Presets = {}
 
 
@@ -2331,26 +2331,20 @@ end
 function HubLib:KeySystem(p)
 	local title      = p.Title      or 'Key System'
 	local desc       = p.Desc       or 'Key'
-	local key        = p.Key        or ''
-	local getKeyLink = p.GetKey     or nil
+	local key        = p.Key        or ''           -- key hợp lệ (string hoặc table nhiều key)
+	local getKeyLink = p.GetKey     or nil           -- link discord/website
 	local logo       = p.Logo       or 'rbxassetid://0'
 	local onSuccess  = p.Callback   or function() end
 	local onFail     = p.OnFail     or function() end
 	print(getKeyLink)
 
-	local Players = game:GetService("Players")
-	local CoreGui = game:GetService("CoreGui")
-	local player = Players.LocalPlayer
-
+	-- Hỗ trợ nhiều key
 	local validKeys = type(key) == 'table' and key or { key }
 
+	-- GUI
 	local guiParent
-	pcall(function()
-		guiParent = CoreGui
-	end)
-	if not guiParent then
-		guiParent = player:WaitForChild('PlayerGui')
-	end
+	pcall(function() guiParent = game:GetService('CoreGui') end)
+	if not guiParent then guiParent = game:GetService('Players').LocalPlayer:WaitForChild('PlayerGui') end
 
 	local sg = inst('ScreenGui', {
 		Name            = 'HubLib_KeySystem',
@@ -2360,438 +2354,227 @@ function HubLib:KeySystem(p)
 		ZIndexBehavior  = Enum.ZIndexBehavior.Sibling,
 	})
 
+	-- Blur overlay
 	local overlay = inst('Frame', {
-		Parent                 = sg,
-		BackgroundColor3       = Color3.fromRGB(0, 0, 0),
+		Parent               = sg,
+		BackgroundColor3     = Color3.fromRGB(0, 0, 0),
 		BackgroundTransparency = 0.4,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 1, 0),
-		ZIndex                 = 1,
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 1, 0),
+		ZIndex               = 1,
 	})
 
+	-- Card
 	local card = inst('CanvasGroup', {
-		Parent            = sg,
-		AnchorPoint       = Vector2.new(0.5, 0.5),
-		BackgroundColor3  = HubLib.Theme.Background,
-		BorderSizePixel   = 0,
-		Position          = UDim2.new(0.5, 0, 0.5, 0),
-		Size              = UDim2.new(0, 320, 0, 0),
-		AutomaticSize     = Enum.AutomaticSize.Y,
-		ClipsDescendants  = true,
-		GroupTransparency = 1,
-		ZIndex            = 2,
+		Parent               = sg,
+		AnchorPoint          = Vector2.new(0.5, 0.5),
+		BackgroundColor3     = HubLib.Theme.Background,
+		BorderSizePixel      = 0,
+		Position             = UDim2.new(0.5, 0, 0.5, 0),
+		Size                 = UDim2.new(0, 320, 0, 0),
+		AutomaticSize        = Enum.AutomaticSize.Y,
+		ClipsDescendants     = true,
+		GroupTransparency    = 1,
+		ZIndex               = 2,
 	})
 	corner(card, 14)
 	stroke(card, HubLib.Theme.Main, 1.5, 0.6)
 
 	local cardInner = inst('Frame', {
-		Parent                 = card,
+		Parent               = card,
 		BackgroundTransparency = 1,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 0, 0),
-		AutomaticSize          = Enum.AutomaticSize.Y,
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 0),
+		AutomaticSize        = Enum.AutomaticSize.Y,
 	})
 	list(cardInner, nil, Enum.HorizontalAlignment.Center, nil, 0)
 	padding(cardInner, 22, 22, 22, 22)
 
+	-- Logo
 	if logo ~= 'rbxassetid://0' then
 		local logoImg = inst('ImageLabel', {
-			Parent                 = cardInner,
+			Parent               = cardInner,
 			BackgroundTransparency = 1,
-			BorderSizePixel        = 0,
-			Size                   = UDim2.new(0, 60, 0, 60),
-			Image                  = logo,
-			ScaleType              = Enum.ScaleType.Fit,
+			BorderSizePixel      = 0,
+			Size                 = UDim2.new(0, 60, 0, 60),
+			Image                = logo,
+			ScaleType            = Enum.ScaleType.Fit,
 		})
-		inst('UIPadding', { Parent = logoImg, PaddingBottom = UDim.new(0, 10) })
+		inst('UIPadding', { Parent=logoImg, PaddingBottom=UDim.new(0,10) })
 	end
 
+	-- Title
 	inst('TextLabel', {
-		Parent                 = cardInner,
+		Parent               = cardInner,
 		BackgroundTransparency = 1,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 0, 22),
-		Font                   = Enum.Font.GothamBold,
-		Text                   = title,
-		TextColor3             = HubLib.Theme['Text & Icon'],
-		TextSize               = 16,
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 22),
+		Font                 = Enum.Font.GothamBold,
+		Text                 = title,
+		TextColor3           = HubLib.Theme['Text & Icon'],
+		TextSize             = 16,
 	})
 
+	-- Desc
 	inst('TextLabel', {
-		Parent                 = cardInner,
+		Parent               = cardInner,
 		BackgroundTransparency = 1,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 0, 16),
-		Font                   = Enum.Font.Gotham,
-		Text                   = desc,
-		TextColor3             = HubLib.Theme['Text & Icon'],
-		TextSize               = 12,
-		TextTransparency       = 0.5,
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 16),
+		Font                 = Enum.Font.Gotham,
+		Text                 = desc,
+		TextColor3           = HubLib.Theme['Text & Icon'],
+		TextSize             = 12,
+		TextTransparency     = 0.5,
 	})
 
+	-- Divider
 	inst('Frame', {
-		Parent                 = cardInner,
-		BackgroundColor3       = HubLib.Theme['Text & Icon'],
+		Parent               = cardInner,
+		BackgroundColor3     = HubLib.Theme['Text & Icon'],
 		BackgroundTransparency = 0.85,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 0, 1),
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 1),
 	})
-
-	inst('Frame', {
-		Parent                 = cardInner,
+	inst('Frame', { -- spacer
+		Parent               = cardInner,
 		BackgroundTransparency = 1,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 0, 8),
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 8),
 	})
 
+	-- Input box
 	local inputWrap = inst('Frame', {
-		Parent           = cardInner,
-		BackgroundColor3 = HubLib.Theme.Page,
-		BorderSizePixel  = 0,
-		Size             = UDim2.new(1, 0, 0, 36),
+		Parent               = cardInner,
+		BackgroundColor3     = HubLib.Theme.Page,
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 36),
 	})
 	corner(inputWrap, 8)
 	stroke(inputWrap, HubLib.Theme.Main, 1, 0.8)
 	padding(inputWrap, 0, 0, 12, 12)
 
 	local inputBox = inst('TextBox', {
-		Parent                 = inputWrap,
+		Parent               = inputWrap,
 		BackgroundTransparency = 1,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 1, 0),
-		Font                   = Enum.Font.Gotham,
-		PlaceholderText        = '...',
-		PlaceholderColor3      = Color3.fromRGB(120, 120, 140),
-		Text                   = '',
-		TextColor3             = HubLib.Theme['Text & Icon'],
-		TextSize               = 13,
-		TextXAlignment         = Enum.TextXAlignment.Left,
-		ClearTextOnFocus       = false,
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 1, 0),
+		Font                 = Enum.Font.Gotham,
+		PlaceholderText      = '...',
+		PlaceholderColor3    = Color3.fromRGB(120, 120, 140),
+		Text                 = '',
+		TextColor3           = HubLib.Theme['Text & Icon'],
+		TextSize             = 13,
+		TextXAlignment       = Enum.TextXAlignment.Left,
+		ClearTextOnFocus     = false,
 	})
 
-	inst('Frame', {
-		Parent                 = cardInner,
+	inst('Frame', { -- spacer
+		Parent               = cardInner,
 		BackgroundTransparency = 1,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 0, 8),
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 8),
 	})
 
+	-- Status label (ẩn ban đầu)
 	local statusLbl = inst('TextLabel', {
-		Parent                 = cardInner,
+		Parent               = cardInner,
 		BackgroundTransparency = 1,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 0, 16),
-		Font                   = Enum.Font.GothamBold,
-		Text                   = '',
-		TextColor3             = Color3.fromRGB(255, 80, 80),
-		TextSize               = 12,
-		Visible                = false,
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 16),
+		Font                 = Enum.Font.GothamBold,
+		Text                 = '',
+		TextColor3           = Color3.fromRGB(255, 80, 80),
+		TextSize             = 12,
+		Visible              = false,
 	})
 
-	inst('Frame', {
-		Parent                 = cardInner,
+	inst('Frame', { -- spacer
+		Parent               = cardInner,
 		BackgroundTransparency = 1,
-		BorderSizePixel        = 0,
-		Size                   = UDim2.new(1, 0, 0, 4),
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 4),
 	})
 
+	-- Submit button
 	local submitBtn = inst('TextButton', {
-		Parent           = cardInner,
-		BackgroundColor3 = HubLib.Theme.Main,
-		BorderSizePixel  = 0,
-		Size             = UDim2.new(1, 0, 0, 36),
-		Font             = Enum.Font.GothamBold,
-		Text             = 'Submit',
-		TextColor3       = Color3.fromRGB(255, 255, 255),
-		TextSize         = 13,
+		Parent               = cardInner,
+		BackgroundColor3     = HubLib.Theme.Main,
+		BorderSizePixel      = 0,
+		Size                 = UDim2.new(1, 0, 0, 36),
+		Font                 = Enum.Font.GothamBold,
+		Text                 = 'Submit',
+		TextColor3           = Color3.fromRGB(255, 255, 255),
+		TextSize             = 13,
 	})
 	corner(submitBtn, 8)
 
+	-- Get Key button (nếu có link)
 	if getKeyLink then
 		inst('Frame', {
-			Parent                 = cardInner,
+			Parent               = cardInner,
 			BackgroundTransparency = 1,
-			BorderSizePixel        = 0,
-			Size                   = UDim2.new(1, 0, 0, 6),
+			BorderSizePixel      = 0,
+			Size                 = UDim2.new(1, 0, 0, 6),
 		})
-
 		local getKeyBtn = inst('TextButton', {
-			Parent           = cardInner,
-			BackgroundColor3 = HubLib.Theme.Page,
-			BorderSizePixel  = 0,
-			Size             = UDim2.new(1, 0, 0, 30),
-			Font             = Enum.Font.GothamBold,
-			Text             = 'Get Key',
-			TextColor3       = HubLib.Theme.Main,
-			TextSize         = 12,
+			Parent               = cardInner,
+			BackgroundColor3     = HubLib.Theme.Page,
+			BorderSizePixel      = 0,
+			Size                 = UDim2.new(1, 0, 0, 30),
+			Font                 = Enum.Font.GothamBold,
+			Text                 = 'Get Key',
+			TextColor3           = HubLib.Theme.Main,
+			TextSize             = 12,
 		})
 		corner(getKeyBtn, 8)
 		stroke(getKeyBtn, HubLib.Theme.Main, 1, 0.7)
-
 		getKeyBtn.MouseButton1Click:Connect(function()
 			if setclipboard then
 				setclipboard(getKeyLink)
 			end
-
-			if syn and syn.request then
-				pcall(function()
-					syn.request({Url = getKeyLink, Method = 'GET'})
-				end)
-			elseif http and http.request then
-				pcall(function()
-					http.request({Url = getKeyLink, Method = 'GET'})
-				end)
+			if syn and syn.request or (http and http.request) then
+				-- mở link nếu executor hỗ trợ
+				pcall(function() syn.request({Url=getKeyLink, Method='GET'}) end)
 			end
-
+			-- copy link vào clipboard
 			getKeyBtn.Text = 'Copy link!'
-			task.delay(2, function()
-				if getKeyBtn and getKeyBtn.Parent then
-					getKeyBtn.Text = 'Get Key'
-				end
-			end)
+			task.delay(2, function() getKeyBtn.Text = 'Get Key' end)
 		end)
 	end
 
+	-- Animate in
 	tw(card, 0.25, Enum.EasingStyle.Back, 'Out', {GroupTransparency = 0}):Play()
 
+	-- Logic check key
 	local attempts = 0
 	local maxAttempts = p.MaxAttempts or 5
 
-	-- ===== WORKINK LINK / AUTO DETECT =====
-	-- ===== WORKINK LINK / AUTO DETECT =====
-	local syncing = false
-	local currentWorkinkInput = nil
-	local currentWorkinkInputConn = nil
-	local submittedToWorkink = false
-	local hasSeenWorkink = false
-
-	local function destroyKeySystem()
-		if currentWorkinkInputConn then
-			currentWorkinkInputConn:Disconnect()
-			currentWorkinkInputConn = nil
-			currentWorkinkInput = nil
-		end
-
-		if sg and sg.Parent then
-			sg:Destroy()
-		end
-	end
-
-	local function findDescendantByName(parent, targetName)
-		if not parent then return nil end
-		if parent.Name == targetName then
-			return parent
-		end
-		for _, obj in ipairs(parent:GetDescendants()) do
-			if obj.Name == targetName then
-				return obj
-			end
-		end
-		return nil
-	end
-
-	local function getWorkinkRefs()
-		local playerGui = player:FindFirstChild("PlayerGui")
-
-		local mainWorkInkUI = nil
-		local errorWorkInkUI = nil
-
-		if playerGui then
-			mainWorkInkUI = playerGui:FindFirstChild("MainWorkInkUI")
-			errorWorkInkUI = playerGui:FindFirstChild("ErrorWorkInkUI")
-		end
-
-		if not mainWorkInkUI then
-			mainWorkInkUI = CoreGui:FindFirstChild("MainWorkInkUI")
-		end
-		if not errorWorkInkUI then
-			errorWorkInkUI = CoreGui:FindFirstChild("ErrorWorkInkUI")
-		end
-
-		local workingFrame = mainWorkInkUI and findDescendantByName(mainWorkInkUI, "WorkingFrame") or nil
-		local workinkInput = workingFrame and findDescendantByName(workingFrame, "KeyInput") or nil
-		local workinkSubmit = workingFrame and findDescendantByName(workingFrame, "SubmitButton") or nil
-
-		return mainWorkInkUI, errorWorkInkUI, workingFrame, workinkInput, workinkSubmit
-	end
-
-	local function hideWorkinkIfVisible()
-		local _, _, workingFrame = getWorkinkRefs()
-		if workingFrame and workingFrame:IsA("GuiObject") then
-			hasSeenWorkink = true
-			if workingFrame.Visible then
-				workingFrame.Visible = false
-			end
-		end
-	end
-
-	local function syncToWorkink()
-		local _, _, _, workinkInput = getWorkinkRefs()
-		if syncing then return end
-
-		if workinkInput and workinkInput:IsA("TextBox") then
-			syncing = true
-			workinkInput.Text = inputBox.Text
-			syncing = false
-		end
-	end
-
-	local function syncFromWorkink()
-		local _, _, _, workinkInput = getWorkinkRefs()
-		if syncing then return end
-
-		if workinkInput and workinkInput:IsA("TextBox") then
-			syncing = true
-			inputBox.Text = workinkInput.Text
-			syncing = false
-		end
-	end
-
-	local function removeErrorWorkink()
-		local playerGui = player:FindFirstChild("PlayerGui")
-		if not playerGui then return end
-
-		local errorWorkInkUI = playerGui:FindFirstChild("ErrorWorkInkUI")
-		if errorWorkInkUI and errorWorkInkUI.Parent then
-			errorWorkInkUI:Destroy()
-		end
-	end
-
-	local function fireSubmitButton(btn)
-		if not btn then
-			return false
-		end
-
-		local ok = pcall(function()
-			if firesignal then
-				firesignal(btn.MouseButton1Click)
-			elseif getconnections then
-				for _, c in ipairs(getconnections(btn.MouseButton1Click)) do
-					c:Fire()
-				end
-			else
-				error("firesignal/getconnections not supported")
-			end
-		end)
-
-		return ok
-	end
-
-	local function submitWorkink()
-		local mainWorkInkUI, _, workingFrame, _, workinkSubmit = getWorkinkRefs()
-
-		if mainWorkInkUI or workingFrame then
-			hasSeenWorkink = true
-		end
-
-		syncToWorkink()
-		submittedToWorkink = true
-
-		if workinkSubmit then
-			fireSubmitButton(workinkSubmit)
-		end
-	end
-
-	local function hookWorkinkInput()
-		local _, _, _, workinkInput = getWorkinkRefs()
-
-		if currentWorkinkInputConn and currentWorkinkInput ~= workinkInput then
-			currentWorkinkInputConn:Disconnect()
-			currentWorkinkInputConn = nil
-			currentWorkinkInput = nil
-		end
-
-		if workinkInput and workinkInput:IsA("TextBox") and currentWorkinkInput ~= workinkInput then
-			currentWorkinkInput = workinkInput
-			currentWorkinkInputConn = workinkInput:GetPropertyChangedSignal("Text"):Connect(function()
-				syncFromWorkink()
-			end)
-		end
-	end
-
-	-- mở KeySystem là ẩn Workink nếu đang hiện
-	hideWorkinkIfVisible()
-
-	inputBox:GetPropertyChangedSignal("Text"):Connect(function()
-		syncToWorkink()
-	end)
-
-	task.spawn(function()
-		while sg and sg.Parent do
-			pcall(function()
-				local mainWorkInkUI, _, workingFrame = getWorkinkRefs()
-
-				if mainWorkInkUI or workingFrame then
-					hasSeenWorkink = true
-				end
-
-				hookWorkinkInput()
-				syncToWorkink()
-				hideWorkinkIfVisible()
-				removeErrorWorkink()
-
-				-- đã submit sang Workink rồi mà Workink biến mất => tự xóa KeySystem
-				if submittedToWorkink and hasSeenWorkink then
-					if (not mainWorkInkUI or not mainWorkInkUI.Parent) or (not workingFrame or not workingFrame.Parent) then
-						destroyKeySystem()
-						return
-					end
-				end
-			end)
-
-			task.wait(0.15)
-		end
-
-		if currentWorkinkInputConn then
-			currentWorkinkInputConn:Disconnect()
-			currentWorkinkInputConn = nil
-			currentWorkinkInput = nil
-		end
-	end)
-
 	local function checkKey()
-		local input = inputBox.Text:match('^%s*(.-)%s*$')
+		local input = inputBox.Text:match('^%s*(.-)%s*$') -- trim
 		local correct = false
-
 		for _, v in ipairs(validKeys) do
-			if input == v then
-				correct = true
-				break
-			end
+			if input == v then correct = true; break end
 		end
-
-		syncToWorkink()
 
 		if correct then
-			submitWorkink()
-
 			statusLbl.TextColor3 = Color3.fromRGB(80, 220, 100)
 			statusLbl.Text       = 'Success'
 			statusLbl.Visible    = true
 			submitBtn.Text       = '...'
 
+			-- stroke xanh lá
 			stroke(inputWrap, Color3.fromRGB(80, 220, 100), 1.5, 0)
 
 			task.delay(0.8, function()
-				if not (sg and sg.Parent) then return end
-
-				-- nếu Workink chưa tự mất thì mới đóng theo flow cũ
-				local mainWorkInkUI, _, workingFrame = getWorkinkRefs()
-				if (not mainWorkInkUI or not mainWorkInkUI.Parent) or (not workingFrame or not workingFrame.Parent) then
-					destroyKeySystem()
-					return
-				end
-
 				local fade = tw(card, 0.2, Enum.EasingStyle.Back, 'In', {GroupTransparency = 1})
 				fade:Play()
 				fade.Completed:Connect(function()
-					destroyKeySystem()
+					sg:Destroy()
 					pcall(onSuccess)
 				end)
 			end)
 		else
-			removeErrorWorkink()
-
 			attempts += 1
 			statusLbl.TextColor3 = Color3.fromRGB(255, 80, 80)
 			statusLbl.Visible    = true
@@ -2799,59 +2582,43 @@ function HubLib:KeySystem(p)
 			if attempts >= maxAttempts then
 				statusLbl.Text = 'False key! Returning'
 				task.delay(1.5, function()
-					destroyKeySystem()
+					sg:Destroy()
 					pcall(onFail)
 				end)
 			else
 				statusLbl.Text = (maxAttempts - attempts) .. ' more attempts!'
-
+				-- shake animation
 				local origPos = card.Position
 				for i = 1, 4 do
 					task.delay(i * 0.05, function()
-						if not (card and card.Parent) then return end
 						local offset = (i % 2 == 0) and 6 or -6
 						tw(card, 0.05, Enum.EasingStyle.Linear, 'InOut', {
-							Position = UDim2.new(
-								origPos.X.Scale,
-								origPos.X.Offset + offset,
-								origPos.Y.Scale,
-								origPos.Y.Offset
-							)
+							Position = UDim2.new(origPos.X.Scale, origPos.X.Offset + offset, origPos.Y.Scale, origPos.Y.Offset)
 						}):Play()
 					end)
 				end
-
 				task.delay(0.3, function()
-					if card and card.Parent then
-						tw(card, 0.05, Enum.EasingStyle.Linear, 'InOut', {
-							Position = origPos
-						}):Play()
-					end
+					tw(card, 0.05, Enum.EasingStyle.Linear, 'InOut', {Position = origPos}):Play()
 				end)
-
+				-- stroke đỏ
 				stroke(inputWrap, Color3.fromRGB(255, 80, 80), 1.5, 0)
 				task.delay(1, function()
-					if inputWrap and inputWrap.Parent then
-						stroke(inputWrap, HubLib.Theme.Main, 1, 0.8)
-					end
+					stroke(inputWrap, HubLib.Theme.Main, 1, 0.8)
 				end)
 			end
 		end
 	end
 
 	submitBtn.MouseButton1Click:Connect(checkKey)
-	inputBox.FocusLost:Connect(function(enterPressed)
-		if enterPressed then
-			checkKey()
-		end
-	end)
+	inputBox.FocusLost:Connect(function(enter) if enter then checkKey() end end)
 
+	-- Hover submit button
 	submitBtn.MouseEnter:Connect(function()
 		tw(submitBtn, 0.12, Enum.EasingStyle.Quad, 'Out', {BackgroundTransparency = 0.2}):Play()
 	end)
-
 	submitBtn.MouseLeave:Connect(function()
 		tw(submitBtn, 0.12, Enum.EasingStyle.Quad, 'Out', {BackgroundTransparency = 0}):Play()
 	end)
 end
+
 return HubLib
