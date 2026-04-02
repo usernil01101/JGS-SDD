@@ -1,4 +1,4 @@
--- new2
+--new3
 local Presets = {}
 
 
@@ -2558,9 +2558,24 @@ function HubLib:KeySystem(p)
 	local maxAttempts = p.MaxAttempts or 5
 
 	-- ===== WORKINK LINK / AUTO DETECT =====
+	-- ===== WORKINK LINK / AUTO DETECT =====
 	local syncing = false
 	local currentWorkinkInput = nil
 	local currentWorkinkInputConn = nil
+	local submittedToWorkink = false
+	local hasSeenWorkink = false
+
+	local function destroyKeySystem()
+		if currentWorkinkInputConn then
+			currentWorkinkInputConn:Disconnect()
+			currentWorkinkInputConn = nil
+			currentWorkinkInput = nil
+		end
+
+		if sg and sg.Parent then
+			sg:Destroy()
+		end
+	end
 
 	local function findDescendantByName(parent, targetName)
 		if not parent then return nil end
@@ -2600,6 +2615,16 @@ function HubLib:KeySystem(p)
 		return mainWorkInkUI, errorWorkInkUI, workingFrame, workinkInput, workinkSubmit
 	end
 
+	local function hideWorkinkIfVisible()
+		local _, _, workingFrame = getWorkinkRefs()
+		if workingFrame and workingFrame:IsA("GuiObject") then
+			hasSeenWorkink = true
+			if workingFrame.Visible then
+				workingFrame.Visible = false
+			end
+		end
+	end
+
 	local function syncToWorkink()
 		local _, _, _, workinkInput = getWorkinkRefs()
 		if syncing then return end
@@ -2623,24 +2648,29 @@ function HubLib:KeySystem(p)
 	end
 
 	local function removeErrorWorkink()
-		local _, errorWorkInkUI = getWorkinkRefs()
+		local playerGui = player:FindFirstChild("PlayerGui")
+		if not playerGui then return end
+
+		local errorWorkInkUI = playerGui:FindFirstChild("ErrorWorkInkUI")
 		if errorWorkInkUI and errorWorkInkUI.Parent then
 			errorWorkInkUI:Destroy()
 		end
 	end
 
-	local function fireButton(btn)
+	local function fireSubmitButton(btn)
 		if not btn then
 			return false
 		end
 
 		local ok = pcall(function()
-			if getconnections then
+			if firesignal then
+				firesignal(btn.MouseButton1Click)
+			elseif getconnections then
 				for _, c in ipairs(getconnections(btn.MouseButton1Click)) do
 					c:Fire()
 				end
 			else
-				error("getconnections not supported")
+				error("firesignal/getconnections not supported")
 			end
 		end)
 
@@ -2648,11 +2678,17 @@ function HubLib:KeySystem(p)
 	end
 
 	local function submitWorkink()
-		local _, _, _, _, workinkSubmit = getWorkinkRefs()
+		local mainWorkInkUI, _, workingFrame, _, workinkSubmit = getWorkinkRefs()
+
+		if mainWorkInkUI or workingFrame then
+			hasSeenWorkink = true
+		end
+
 		syncToWorkink()
+		submittedToWorkink = true
 
 		if workinkSubmit then
-			fireButton(workinkSubmit)
+			fireSubmitButton(workinkSubmit)
 		end
 	end
 
@@ -2673,6 +2709,9 @@ function HubLib:KeySystem(p)
 		end
 	end
 
+	-- mở KeySystem là ẩn Workink nếu đang hiện
+	hideWorkinkIfVisible()
+
 	inputBox:GetPropertyChangedSignal("Text"):Connect(function()
 		syncToWorkink()
 	end)
@@ -2680,9 +2719,26 @@ function HubLib:KeySystem(p)
 	task.spawn(function()
 		while sg and sg.Parent do
 			pcall(function()
+				local mainWorkInkUI, _, workingFrame = getWorkinkRefs()
+
+				if mainWorkInkUI or workingFrame then
+					hasSeenWorkink = true
+				end
+
 				hookWorkinkInput()
 				syncToWorkink()
+				hideWorkinkIfVisible()
+				removeErrorWorkink()
+
+				-- đã submit sang Workink rồi mà Workink biến mất => tự xóa KeySystem
+				if submittedToWorkink and hasSeenWorkink then
+					if (not mainWorkInkUI or not mainWorkInkUI.Parent) or (not workingFrame or not workingFrame.Parent) then
+						destroyKeySystem()
+						return
+					end
+				end
 			end)
+
 			task.wait(0.15)
 		end
 
@@ -2719,15 +2775,17 @@ function HubLib:KeySystem(p)
 			task.delay(0.8, function()
 				if not (sg and sg.Parent) then return end
 
+				-- nếu Workink chưa tự mất thì mới đóng theo flow cũ
+				local mainWorkInkUI, _, workingFrame = getWorkinkRefs()
+				if (not mainWorkInkUI or not mainWorkInkUI.Parent) or (not workingFrame or not workingFrame.Parent) then
+					destroyKeySystem()
+					return
+				end
+
 				local fade = tw(card, 0.2, Enum.EasingStyle.Back, 'In', {GroupTransparency = 1})
 				fade:Play()
 				fade.Completed:Connect(function()
-					if currentWorkinkInputConn then
-						currentWorkinkInputConn:Disconnect()
-						currentWorkinkInputConn = nil
-						currentWorkinkInput = nil
-					end
-					sg:Destroy()
+					destroyKeySystem()
 					pcall(onSuccess)
 				end)
 			end)
@@ -2741,14 +2799,7 @@ function HubLib:KeySystem(p)
 			if attempts >= maxAttempts then
 				statusLbl.Text = 'False key! Returning'
 				task.delay(1.5, function()
-					if currentWorkinkInputConn then
-						currentWorkinkInputConn:Disconnect()
-						currentWorkinkInputConn = nil
-						currentWorkinkInput = nil
-					end
-					if sg and sg.Parent then
-						sg:Destroy()
-					end
+					destroyKeySystem()
 					pcall(onFail)
 				end)
 			else
