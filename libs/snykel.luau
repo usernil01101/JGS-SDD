@@ -1,4 +1,4 @@
-
+-- ne
 local Presets = {}
 
 
@@ -162,74 +162,8 @@ HubLib.Theme = Presets.Custom
 
 local SaveTheme = {}
 local ScreenGui
-local U          = game:GetService('UserInputService')
-local Tw         = game:GetService('TweenService')
-local RunService = game:GetService('RunService')
-
-local function viewportSize()
-	local cam = workspace.CurrentCamera
-	if cam then
-		return cam.ViewportSize
-	end
-	return Vector2.new(1280, 720)
-end
-
-local function isMobile()
-	local vp = viewportSize()
-	return U.TouchEnabled and (not U.KeyboardEnabled or vp.X <= 900)
-end
-
-local function resolveWindowSize(baseSize)
-	local vp = viewportSize()
-	local baseX = (baseSize and baseSize.X and baseSize.X.Offset or 530)
-	local baseY = (baseSize and baseSize.Y and baseSize.Y.Offset or 400)
-
-	if isMobile() then
-		local w = math.max(320, math.min(vp.X - 16, 520))
-		local h = math.max(300, math.min(vp.Y - 20, 760))
-		return UDim2.fromOffset(w, h)
-	end
-
-	local w = math.min(baseX, math.max(350, vp.X - 30))
-	local h = math.min(baseY, math.max(280, vp.Y - 30))
-	return UDim2.fromOffset(w, h)
-end
-
-local function clampOffsetRect(x, y, w, h, pad)
-	local vp = viewportSize()
-	pad = pad or 8
-
-	return UDim2.fromOffset(
-		math.clamp(x, pad, math.max(pad, vp.X - w - pad)),
-		math.clamp(y, pad, math.max(pad, vp.Y - h - pad))
-	)
-end
-
-local function pointerPos()
-	local p = U:GetMouseLocation()
-	return p.X, p.Y
-end
-
-local function bindViewportChange(callback)
-	local camConn
-
-	local function hookCamera()
-		if camConn then
-			camConn:Disconnect()
-		end
-
-		local cam = workspace.CurrentCamera
-		if cam then
-			camConn = cam:GetPropertyChangedSignal('ViewportSize'):Connect(callback)
-		end
-	end
-
-	hookCamera()
-	workspace:GetPropertyChangedSignal('CurrentCamera'):Connect(function()
-		hookCamera()
-		callback()
-	end)
-end
+local U  = game:GetService('UserInputService')
+local Tw = game:GetService('TweenService')
 
 -- ─── Helpers ───────────────────────────────────────
 local function tw(v, t, s, dir, goals)
@@ -298,9 +232,9 @@ end
 
 local function ripple(container, clickBtn)
 	clickBtn.MouseButton1Click:Connect(function()
-		local mx, my = pointerPos()
-		local rx = mx - container.AbsolutePosition.X
-		local ry = my - container.AbsolutePosition.Y
+		local Mouse = game:GetService('Players').LocalPlayer:GetMouse()
+		local rx = Mouse.X - container.AbsolutePosition.X
+		local ry = Mouse.Y - container.AbsolutePosition.Y
 		if rx < 0 or ry < 0 or rx > container.AbsoluteSize.X or ry > container.AbsoluteSize.Y then return end
 		local c = inst('Frame',{
 			Parent=container, BackgroundColor3=Color3.new(1,1,1),
@@ -500,11 +434,10 @@ local function getIcon(i)
 end
 -- ─── Item background helper ─────────────────────────
 local function itemBg(parent, title, desc, icon, funcType, T)
-	local mobile = isMobile()
 	local wrap = inst('Frame',{
 		Name='Real Background', Parent=parent,
 		BackgroundTransparency=1, BorderSizePixel=0,
-		Size=UDim2.new(1,0,0,mobile and 42 or 35), ClipsDescendants=true
+		Size=UDim2.new(1,0,0,35), ClipsDescendants=true
 	})
 	local bg = inst('Frame',{
 		Name='Background', Parent=wrap,
@@ -557,9 +490,7 @@ local function itemBg(parent, title, desc, icon, funcType, T)
 	local function updateHeight()
 		task.defer(function()
 			local ll = inner:FindFirstChildOfClass('UIListLayout')
-			local base = mobile and 42 or 35
-			local extraPad = mobile and 26 or 21
-			local h = ll and ll.AbsoluteContentSize.Y + extraPad or base
+			local h = ll and ll.AbsoluteContentSize.Y + 21 or 35
 			wrap.Size = UDim2.new(1,0,0,h)
 		end)
 	end
@@ -594,7 +525,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 	local valBox = inst('Frame',{
 		Parent=anchor, BackgroundColor3=T.Function.Dropdown['Value Background'],
 		BorderSizePixel=0, AnchorPoint=Vector2.new(1,0.5),
-		Position=UDim2.new(1,0,0.5,0), Size=UDim2.new(0,isMobile() and 110 or 100,0,isMobile() and 24 or 20)
+		Position=UDim2.new(1,0,0.5,0), Size=UDim2.new(0,100,0,20)
 	})
 	regTheme('Function.Dropdown.Value Background', valBox)
 	corner(valBox, 4)
@@ -616,10 +547,9 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 	regTheme('Text & Icon', chevron)
 
 	-- Dropdown panel
-	local panelWidth = isMobile() and 170 or 150
 	local panel = inst('Frame',{
 		Parent=ScreenGui, BackgroundColor3=T.Function.Dropdown['Dropdown Select'].Background,
-		BorderSizePixel=0, Size=UDim2.new(0,panelWidth,0,0), ClipsDescendants=true
+		BorderSizePixel=0, Size=UDim2.new(0,150,0,0), ClipsDescendants=true
 	})
 	regTheme('Function.Dropdown.Dropdown Select.Background', panel)
 	corner(panel, 4)
@@ -629,7 +559,7 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 	-- Search bar
 	local searchFrame = inst('Frame',{
 		Name='Search', Parent=panel, BackgroundTransparency=0.95, BorderSizePixel=0,
-		Size=UDim2.new(1,0,0,isMobile() and 24 or 20)
+		Size=UDim2.new(1,0,0,20)
 	})
 	regTheme('Function.Dropdown.Dropdown Select.Search', searchFrame)
 	corner(searchFrame, 4)
@@ -663,9 +593,8 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 		if not isOpen then return end
 		local visible = 0
 		for _, c in ipairs(sf:GetChildren()) do if c:IsA('Frame') and c.Visible then visible += 1 end end
-		local maxH = isMobile() and math.min(math.floor(viewportSize().Y * 0.45), 240) or 200
-		local h = math.min(itemList.AbsoluteContentSize.Y + 54, maxH)
-		tw(panel, 0.15, Enum.EasingStyle.Exponential, 'Out', {Size=UDim2.new(0,panelWidth,0,h)}):Play()
+		local h = math.min(itemList.AbsoluteContentSize.Y + 54, 200)
+		tw(panel, 0.15, Enum.EasingStyle.Exponential, 'Out', {Size=UDim2.new(0,150,0,h)}):Play()
 	end
 
 	searchBox.Changed:Connect(function()
@@ -683,26 +612,24 @@ local function buildDropdownSelect(anchor, clickTarget, isMulti, callback, defau
 		if isOpen then return end
 		isOpen = true
 		panel.Visible = true
-		local tx = valBox.AbsolutePosition.X - panel.Parent.AbsolutePosition.X + valBox.Size.X.Offset - (panelWidth - 31)
+		local tx = valBox.AbsolutePosition.X - panel.Parent.AbsolutePosition.X + valBox.Size.X.Offset - 119
 		local ty = valBox.AbsolutePosition.Y - panel.Parent.AbsolutePosition.Y + valBox.Size.Y.Offset - 25
-		local maxH = isMobile() and math.min(math.floor(viewportSize().Y * 0.45), 240) or 200
-		local h = math.min(itemList.AbsoluteContentSize.Y + 54, maxH)
-		local pos = clampOffsetRect(tx, ty, panelWidth, h, 8)
-		tw(panel, 0.15, Enum.EasingStyle.Linear, 'Out', {Size=UDim2.new(0,panelWidth,0,h), Position=pos}):Play()
+		local h = math.min(itemList.AbsoluteContentSize.Y + 54, 200)
+		tw(panel, 0.15, Enum.EasingStyle.Linear, 'Out', {Size=UDim2.new(0,150,0,h), Position=UDim2.new(0,tx,0,ty)}):Play()
 		tw(panelStroke, 0.15, Enum.EasingStyle.Linear, 'Out', {Transparency=0.95}):Play()
 	end
 	local function closePanel()
 		if not isOpen then return end
 		tw(panelStroke, 0.15, Enum.EasingStyle.Linear, 'Out', {Transparency=1}):Play()
-		local t = tw(panel, 0.15, Enum.EasingStyle.Linear, 'Out', {Size=UDim2.new(0,panelWidth,0,0)})
+		local t = tw(panel, 0.15, Enum.EasingStyle.Linear, 'Out', {Size=UDim2.new(0,150,0,0)})
 		t:Play()
 		t.Completed:Connect(function() panel.Visible = false; isOpen = false end)
 	end
 
 	U.InputBegan:Connect(function(inp)
-		if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+		if inp.UserInputType == Enum.UserInputType.MouseButton1 then
 			local b, s = panel.AbsolutePosition, panel.AbsoluteSize
-			local mx, my = pointerPos()
+			local mx, my = game:GetService('Players').LocalPlayer:GetMouse().X, game:GetService('Players').LocalPlayer:GetMouse().Y
 			if mx < b.X or mx > b.X+s.X or my < b.Y-21 or my > b.Y+s.Y then closePanel() end
 		end
 	end)
@@ -817,14 +744,8 @@ function HubLib:Window(p)
 	local discord = p.DiscordLink or nil
 	local version = p.Version or nil
 	local cfg     = p.Config or {}
-	local keybind      = cfg.Keybind or Enum.KeyCode.RightShift
-	local baseSize     = cfg.Size or UDim2.new(0, 530, 0, 400)
-	local size         = resolveWindowSize(baseSize)
-	local mobile       = isMobile()
-	local sidebarWidth = mobile and 88 or 107
-	local topbarHeight = mobile and 46 or 42
-	local ctrlBtnSize  = mobile and 18 or 16
-	local miniIconPx   = mobile and 56 or 50
+	local keybind = cfg.Keybind or Enum.KeyCode.RightShift
+	local size    = cfg.Size    or UDim2.new(0, 530, 0, 400)
 
 	-- resolve theme
 	local themeName = p.Theme or 'Custom'
@@ -851,7 +772,6 @@ function HubLib:Window(p)
 	ScreenGui = inst('ScreenGui',{
 		Name='HubLib_GUI', ResetOnSpawn=false,
 		ZIndexBehavior=Enum.ZIndexBehavior.Sibling, DisplayOrder=999,
-		IgnoreGuiInset=false,
 		Parent=guiParent
 	})
 
@@ -885,17 +805,17 @@ function HubLib:Window(p)
 	local contentArea = inst('Frame',{
 		Name='Page', Parent=mainFrame, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,1,0)
 	})
-	padding(contentArea, topbarHeight + 3, 5, sidebarWidth + 13, 5)
+	padding(contentArea, 45, 5, 120, 5)
 
 	-- ── Topbar ──────────────────────────────────────
 	local topbar = inst('Frame',{
 		Name='Topbar', Parent=mainFrame, BackgroundTransparency=1, BorderSizePixel=0,
-		Size=UDim2.new(1,0,0,topbarHeight)
+		Size=UDim2.new(1,0,0,42)
 	})
 	-- divider line
 	local divH = inst('Frame',{Parent=topbar, BackgroundColor3=T.Page, BorderSizePixel=0, AnchorPoint=Vector2.new(0,1), Position=UDim2.new(0,0,1,0), Size=UDim2.new(1,0,0,1)})
 	regTheme('Page', divH)
-	local divV = inst('Frame',{Parent=mainFrame, BackgroundColor3=T.Page, BorderSizePixel=0, Position=UDim2.new(0,sidebarWidth + 3,0,topbarHeight), Size=UDim2.new(0,1,1,-topbarHeight), ZIndex=5})
+	local divV = inst('Frame',{Parent=mainFrame, BackgroundColor3=T.Page, BorderSizePixel=0, Position=UDim2.new(0,110,0,42), Size=UDim2.new(0,1,1,-42), ZIndex=5})
 	regTheme('Page', divV)
 
 	-- Left: icon + title
@@ -953,7 +873,7 @@ function HubLib:Window(p)
 	local function ctrlBtn(imgId, order, alpha)
 		return inst('ImageButton',{
 			Parent=controls, Active=true, BackgroundTransparency=1, BorderSizePixel=0,
-			LayoutOrder=order, Size=UDim2.new(0,ctrlBtnSize,0,ctrlBtnSize),
+			LayoutOrder=order, Size=UDim2.new(0,16,0,16),
 			Image=imgId, ImageTransparency=alpha or 0
 		})
 	end
@@ -964,7 +884,7 @@ function HubLib:Window(p)
 	-- Theme dropdown in topbar
 	local themeHolder = inst('Frame',{
 		Name='ThemeHolder', Parent=controls, BackgroundTransparency=1, BorderSizePixel=0,
-		LayoutOrder=1, Size=UDim2.new(0,mobile and 95 or 120,0.8,0)
+		LayoutOrder=1, Size=UDim2.new(0,120,0.8,0)
 	})
 
 	-- Discord button
@@ -990,9 +910,9 @@ function HubLib:Window(p)
 		Parent=mainFrame, BackgroundTransparency=1, BorderSizePixel=0,
 		Size=UDim2.new(1,0,1,0)
 	})
-	padding(sidebarArea, topbarHeight + 3, 5, 3, 0)
+	padding(sidebarArea, 45, 5, 3, 0)
 
-	local sidebarOuter = inst('Frame',{Parent=sidebarArea, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(0,sidebarWidth,1,0)})
+	local sidebarOuter = inst('Frame',{Parent=sidebarArea, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(0,107,1,0)})
 	local sidebarSF = inst('ScrollingFrame',{
 		Name='SidebarSF', Parent=sidebarOuter, Active=true, BackgroundTransparency=1, BorderSizePixel=0,
 		Size=UDim2.new(1,0,1,0), ClipsDescendants=true,
@@ -1056,16 +976,14 @@ function HubLib:Window(p)
 	local miniIcon = inst('ImageButton', {
 		Name            = 'MiniIcon',
 		Parent          = ScreenGui,
-		Size            = UDim2.fromOffset(miniIconPx, miniIconPx),
-		Position        = UDim2.new(0, 20, 0.5, -math.floor(miniIconPx / 2)),
+		Size            = UDim2.fromOffset(50, 50),
+		Position        = UDim2.new(0, 20, 0.5, -25),
 		BackgroundColor3 = T.Main,
 		BackgroundTransparency = 1,
 		Visible         = false,
 		ZIndex          = 100,
 		BorderSizePixel = 0,
 	})
-	regTheme('Main', miniIcon)
-	corner(miniIcon, 100)
 
 	stroke(miniIcon, Color3.new(1,1,1), 2, 0.7)
 
@@ -1081,38 +999,6 @@ function HubLib:Window(p)
 		ImageRectSize       = getIcon(icon).ImageRectSize,
 		ImageRectOffset     = getIcon(icon).ImageRectOffset or Vector2.new(0,0),
 	})
-	regTheme('Text & Icon', miniIconImg)
-
-	local mobileToggle
-	if mobile then
-		mobileToggle = inst('ImageButton', {
-			Name = 'MobileToggle',
-			Parent = ScreenGui,
-			Size = UDim2.fromOffset(46, 46),
-			Position = UDim2.new(1, -62, 1, -78),
-			BackgroundColor3 = T.Main,
-			BackgroundTransparency = 0.1,
-			BorderSizePixel = 0,
-			ZIndex = 101,
-		})
-		regTheme('Main', mobileToggle)
-		corner(mobileToggle, 100)
-		stroke(mobileToggle, Color3.new(1,1,1), 1.5, 0.7)
-		drag(mobileToggle, mobileToggle)
-
-		local mobileToggleImg = inst('ImageLabel', {
-			Parent = mobileToggle,
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			AnchorPoint = Vector2.new(0.5,0.5),
-			Position = UDim2.new(0.5,0,0.5,0),
-			Size = UDim2.fromOffset(22,22),
-			Image = getIcon(icon).Image,
-			ImageRectSize = getIcon(icon).ImageRectSize,
-			ImageRectOffset = getIcon(icon).ImageRectOffset or Vector2.new(0,0),
-		})
-		regTheme('Text & Icon', mobileToggleImg)
-	end
 
 	-- Drag miniIcon
 	drag(miniIcon, miniIcon)
@@ -1120,7 +1006,6 @@ function HubLib:Window(p)
 	-- Bấm miniIcon → phóng to lại
 	miniIcon.MouseButton1Click:Connect(function()
 		miniIcon.Visible = false
-		if mobileToggle then mobileToggle.Visible = true end
 		shadow.Visible   = true
 		shadow.Size      = UDim2.fromOffset(0, 0)
 		tw(shadow, 0.4, Enum.EasingStyle.Back, 'Out', {Size = storedSize}):Play()
@@ -1136,9 +1021,8 @@ function HubLib:Window(p)
 			if isMinimized then
 				shadow.Visible    = false
 				miniIcon.Visible  = true
-				if mobileToggle then mobileToggle.Visible = false end
 				miniIcon.Size     = UDim2.fromOffset(0, 0)
-				tw(miniIcon, 0.35, Enum.EasingStyle.Elastic, 'Out', {Size = UDim2.fromOffset(miniIconPx, miniIconPx)}):Play()
+				tw(miniIcon, 0.35, Enum.EasingStyle.Elastic, 'Out', {Size = UDim2.fromOffset(50, 50)}):Play()
 			end
 		end)
 	end)
@@ -1150,7 +1034,6 @@ function HubLib:Window(p)
 		-- Nếu đang minimize (miniIcon đang hiện) → phóng to lại
 		if miniIcon.Visible then
 			miniIcon.Visible = false
-			if mobileToggle then mobileToggle.Visible = true end
 			isMinimized = false
 			shadow.Visible = true
 			shadow.Size = UDim2.fromOffset(0, 0)
@@ -1159,20 +1042,6 @@ function HubLib:Window(p)
 			shadow.Visible = not shadow.Visible
 		end
 	end)
-
-	if mobileToggle then
-		mobileToggle.MouseButton1Click:Connect(function()
-			if miniIcon.Visible then
-				miniIcon.Visible = false
-				isMinimized = false
-				shadow.Visible = true
-				shadow.Size = UDim2.fromOffset(0, 0)
-				tw(shadow, 0.4, Enum.EasingStyle.Back, 'Out', {Size = storedSize}):Play()
-			else
-				shadow.Visible = not shadow.Visible
-			end
-		end)
-	end
 
 	-- ── Notify ──────────────────────────────────────
 	local notifContainer = inst('Frame',{
@@ -1317,7 +1186,7 @@ function HubLib:Window(p)
 
 		local tabBtn = inst('Frame',{
 			Name='Tab', Parent=tabList, BackgroundTransparency=1, BorderSizePixel=0,
-			Size=UDim2.new(1,0,0,mobile and 34 or 30)
+			Size=UDim2.new(1,0,0,30)
 		})
 		local tabInner = inst('Frame',{Name='Func', Parent=tabBtn, BackgroundTransparency=1, BorderSizePixel=0, Size=UDim2.new(1,0,1,0)})
 		list(tabInner, Enum.FillDirection.Horizontal, nil, Enum.VerticalAlignment.Center, 8)
@@ -1347,7 +1216,7 @@ function HubLib:Window(p)
 		})
 		regTheme('Page', page)
 		corner(page, 10)
-		padding(page, mobile and 8 or 10, mobile and 8 or 10, mobile and 8 or 10, mobile and 8 or 10)
+		padding(page, 10, 10, 10, 10)
 
 		local pageSF = inst('ScrollingFrame',{
 			Parent=page, Active=true, BackgroundTransparency=1, BorderSizePixel=0,
@@ -1604,7 +1473,7 @@ function HubLib:Window(p)
 				-- value textbox
 				local vbox = inst('Frame',{
 					Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=T.Function.Slider['Value Background'],
-					BorderSizePixel=0, Position=UDim2.new(1,-130,0.5,0), Size=UDim2.new(0,50,0,mobile and 24 or 20)
+					BorderSizePixel=0, Position=UDim2.new(1,-130,0.5,0), Size=UDim2.new(0,50,0,20)
 				})
 				regTheme('Function.Slider.Value Background', vbox)
 				corner(vbox, 4)
@@ -1618,7 +1487,7 @@ function HubLib:Window(p)
 				regTheme('Text & Icon', vtb)
 
 				-- slider bar
-				local barWrap = inst('Frame',{Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,115,0,mobile and 24 or 20)})
+				local barWrap = inst('Frame',{Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,115,0,20)})
 				local barBg = inst('Frame',{Parent=barWrap, AnchorPoint=Vector2.new(0.5,0.5), BackgroundColor3=T.Function.Slider['Slider Bar'], BorderSizePixel=0, Position=UDim2.new(0.5,0,0.5,0), Size=UDim2.new(1,0,0,8)})
 				regTheme('Function.Slider.Slider Bar', barBg)
 				corner(barBg, 100)
@@ -1717,7 +1586,7 @@ function HubLib:Window(p)
 
 				local tbox = inst('Frame',{
 					Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=T.Function.Textbox['Value Background'],
-					BorderSizePixel=0, Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,130,0,mobile and 28 or 25)
+					BorderSizePixel=0, Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,130,0,25)
 				})
 				regTheme('Function.Textbox.Value Background', tbox)
 				corner(tbox, 4)
@@ -1765,7 +1634,7 @@ function HubLib:Window(p)
 
 				local kbox = inst('Frame',{
 					Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=T.Function.Keybind['Value Background'],
-					BorderSizePixel=0, Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,40,0,mobile and 24 or 20)
+					BorderSizePixel=0, Position=UDim2.new(1,-13,0.5,0), Size=UDim2.new(0,40,0,20)
 				})
 				regTheme('Function.Keybind.Value Background', kbox)
 				corner(kbox, 4)
@@ -1849,17 +1718,15 @@ function HubLib:Window(p)
 
 				local dot = inst('Frame',{
 					Parent=bg, AnchorPoint=Vector2.new(1,0.5), BackgroundColor3=val,
-					BorderSizePixel=0, Position=UDim2.new(1,-10,0.5,0), Size=UDim2.new(0,mobile and 24 or 20,0,mobile and 24 or 20)
+					BorderSizePixel=0, Position=UDim2.new(1,-10,0.5,0), Size=UDim2.new(0,20,0,20)
 				})
 				corner(dot, 100)
 				local glow = inst('ImageLabel',{Parent=dot, AnchorPoint=Vector2.new(0.5,0.5), BackgroundTransparency=1, BorderSizePixel=0, Position=UDim2.new(0.5,0,0.5,0), Size=UDim2.new(1.5,0,1.5,0), Image='rbxassetid://105506802034513', ImageColor3=val, ImageTransparency=0.2})
 
 				-- Color picker panel
-				local pickerWidth = isMobile() and 220 or 200
-				local pickerHeight = isMobile() and 138 or 125
 				local panel = inst('Frame',{
 					Name='ColorPanel', Parent=ScreenGui, BackgroundColor3=T.Function['Color Picker']['Color Select'].Background,
-					BorderSizePixel=0, Size=UDim2.new(0,pickerWidth,0,0), ClipsDescendants=true
+					BorderSizePixel=0, Size=UDim2.new(0,200,0,0), ClipsDescendants=true
 				})
 				regTheme('Function.Color Picker.Color Select.Background', panel)
 				corner(panel, 6)
@@ -1919,24 +1786,23 @@ function HubLib:Window(p)
 				local isOpen = false
 				local function openPicker()
 					isOpen = true
-					local tx = dot.AbsolutePosition.X - panel.Parent.AbsolutePosition.X - (isMobile() and 165 or 145)
+					local tx = dot.AbsolutePosition.X - panel.Parent.AbsolutePosition.X - 145
 					local ty = dot.AbsolutePosition.Y - panel.Parent.AbsolutePosition.Y - 50
-					local pos = clampOffsetRect(tx, ty, pickerWidth, pickerHeight, 8)
-					tw(panel, 0.15, Enum.EasingStyle.Exponential, 'Out', {Size=UDim2.new(0,pickerWidth,0,pickerHeight), Position=pos}):Play()
+					tw(panel, 0.15, Enum.EasingStyle.Exponential, 'Out', {Size=UDim2.new(0,200,0,125), Position=UDim2.new(0,tx,0,ty)}):Play()
 					tw(ps, 0.15, Enum.EasingStyle.Linear, 'Out', {Transparency=0.9}):Play()
 				end
 				local function closePicker()
 					isOpen = false
-					tw(panel, 0.15, Enum.EasingStyle.Exponential, 'Out', {Size=UDim2.new(0,pickerWidth,0,0)}):Play()
+					tw(panel, 0.15, Enum.EasingStyle.Exponential, 'Out', {Size=UDim2.new(0,200,0,0)}):Play()
 					tw(ps, 0.15, Enum.EasingStyle.Linear, 'Out', {Transparency=0.95}):Play()
 				end
 
 				click(bg).MouseButton1Click:Connect(function() if isOpen then closePicker() else openPicker() end end)
 
 				U.InputBegan:Connect(function(inp)
-					if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+					if inp.UserInputType == Enum.UserInputType.MouseButton1 then
 						local b2, s2 = panel.AbsolutePosition, panel.AbsoluteSize
-						local mx, my = pointerPos()
+						local mx, my = Mouse.X, Mouse.Y
 						if mx < b2.X or mx > b2.X+s2.X or my < b2.Y-21 or my > b2.Y+s2.Y then closePicker() end
 					end
 				end)
@@ -1944,9 +1810,8 @@ function HubLib:Window(p)
 				local function startColorDrag(input)
 					if colorInput then colorInput:Disconnect() end
 					colorInput = RS.RenderStepped:Connect(function()
-						local mx, my = pointerPos()
-						S = math.clamp((mx - colorPad.AbsolutePosition.X) / colorPad.AbsoluteSize.X, 0, 1)
-						V = 1 - math.clamp((my - colorPad.AbsolutePosition.Y) / colorPad.AbsoluteSize.Y, 0, 1)
+						S = math.clamp((Mouse.X - colorPad.AbsolutePosition.X) / colorPad.AbsoluteSize.X, 0, 1)
+						V = 1 - math.clamp((Mouse.Y - colorPad.AbsolutePosition.Y) / colorPad.AbsoluteSize.Y, 0, 1)
 						tw(colorSel, 0.1, Enum.EasingStyle.Exponential, 'Out', {Position=UDim2.new(S,0,1-V,0)}):Play()
 						updatePicker()
 					end)
@@ -1954,8 +1819,7 @@ function HubLib:Window(p)
 				local function startHueDrag(input)
 					if hueInput then hueInput:Disconnect() end
 					hueInput = RS.RenderStepped:Connect(function()
-						local _, my = pointerPos()
-						H = 1 - math.clamp((my - hueBar.AbsolutePosition.Y) / hueBar.AbsoluteSize.Y, 0, 1)
+						H = 1 - math.clamp((Mouse.Y - hueBar.AbsolutePosition.Y) / hueBar.AbsoluteSize.Y, 0, 1)
 						tw(hueSel, 0.1, Enum.EasingStyle.Exponential, 'Out', {Position=UDim2.new(0.5,0,1-H,0)}):Play()
 						updatePicker()
 					end)
@@ -2456,38 +2320,6 @@ function HubLib:Window(p)
 
 		return Tab
 	end
-
-	local function updateResponsiveWindow()
-		storedSize = resolveWindowSize(baseSize)
-
-		if shadow.Visible then
-			shadow.Size = storedSize
-			shadow.Position = UDim2.new(0.5,0,0.5,0)
-		end
-
-		if mobileToggle then
-			mobileToggle.Position = clampOffsetRect(
-				mobileToggle.Position.X.Offset,
-				mobileToggle.Position.Y.Offset,
-				mobileToggle.AbsoluteSize.X > 0 and mobileToggle.AbsoluteSize.X or 46,
-				mobileToggle.AbsoluteSize.Y > 0 and mobileToggle.AbsoluteSize.Y or 46,
-				8
-			)
-		end
-
-		if miniIcon.Visible then
-			miniIcon.Position = clampOffsetRect(
-				miniIcon.Position.X.Offset,
-				miniIcon.Position.Y.Offset,
-				miniIcon.AbsoluteSize.X > 0 and miniIcon.AbsoluteSize.X or miniIconPx,
-				miniIcon.AbsoluteSize.Y > 0 and miniIcon.AbsoluteSize.Y or miniIconPx,
-				8
-			)
-		end
-	end
-
-	bindViewportChange(updateResponsiveWindow)
-	task.defer(updateResponsiveWindow)
 
 	return Win
 end
