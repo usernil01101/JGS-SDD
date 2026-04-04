@@ -26,7 +26,7 @@ return {
 			},
 			{
 				Title     = 'Standupe',
-				Author    = 'dh_0dk36',
+				Author    = 'dh00kd',
 				ImageName = 'Standupe',
 				ImageUrl  = 'https://raw.githubusercontent.com/usernil01101/JGS-SDD/refs/heads/main/Images/logo',
 				Callback  = function()
@@ -50,7 +50,7 @@ return {
 		},
 		{
 			Title     = 'Fling All',
-			Author    = 'meth0x01',
+			Author    = 'Flua0',
 			ImageName = 'Fling',
 			ImageUrl  = 'https://raw.githubusercontent.com/usernil01101/JGS-SDD/refs/heads/main/Images/flingico',
 			Callback  = function()
@@ -59,7 +59,7 @@ return {
 		},
 		{
 			Title     = 'Invisible',
-			Author    = 'meth0x01',
+			Author    = 'Flua0',
 			ImageName = 'Invisible',
 			ImageUrl  = 'https://raw.githubusercontent.com/usernil01101/JGS-SDD/refs/heads/main/Images/Invisibleico',
 			Callback  = function()
