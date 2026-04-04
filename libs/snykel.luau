@@ -1,4 +1,4 @@
--- ne
+-- ne1
 local Presets = {}
 
 
@@ -1008,21 +1008,21 @@ function HubLib:Window(p)
 		miniIcon.Visible = false
 		shadow.Visible   = true
 		shadow.Size      = UDim2.fromOffset(0, 0)
-		tw(shadow, 0.4, Enum.EasingStyle.Back, 'Out', {Size = storedSize}):Play()
+		tw(shadow, 0.4, Enum.EasingStyle.Sine, 'Out', {Size = storedSize}):Play()
 	end)
 
 	-- Bấm nút minimize → thu nhỏ thành icon
 	local isMinimized = false
 	miniBtn.MouseButton1Click:Connect(function()
 		isMinimized = true
-		local t = tw(shadow, 0.3, Enum.EasingStyle.Back, 'In', {Size = UDim2.fromOffset(0, 0)})
+		local t = tw(shadow, 0.3, Enum.EasingStyle.Sine, 'In', {Size = UDim2.fromOffset(0, 0)})
 		t:Play()
 		t.Completed:Connect(function()
 			if isMinimized then
 				shadow.Visible    = false
 				miniIcon.Visible  = true
 				miniIcon.Size     = UDim2.fromOffset(0, 0)
-				tw(miniIcon, 0.35, Enum.EasingStyle.Elastic, 'Out', {Size = UDim2.fromOffset(50, 50)}):Play()
+				tw(miniIcon, 0.35, Enum.EasingStyle.Sine, 'Out', {Size = UDim2.fromOffset(50, 50)}):Play()
 			end
 		end)
 	end)
